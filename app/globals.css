@@ -23,4 +23,10 @@ nav {
     padding-top: 10px;
 }
 
+main {
+    max-width: 1140px;
+    margin: auto;
+    padding: 20px;
+}
+
 
