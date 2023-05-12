@@ -2,4 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+header {
+    background-color: azure;
+}
+
+.header-info {
+    max-width: 1140px;
+    padding: 20px 10px 10px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+}
+
+.main-logo {
+    font-size: 2em;
+}
+
+nav {
+    margin-left: 30px;
+    padding-top: 10px;
+}
+
 
