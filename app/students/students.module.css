@@ -15,6 +15,8 @@
     border: solid grey 1px;
     margin: 10px 0;
     height: 90%;
+    overflow: hidden;
+    overflow: auto;
 }
 
 .studentInfo {
