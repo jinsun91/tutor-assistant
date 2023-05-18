@@ -2,7 +2,7 @@
 
 import { AiOutlinePlus } from 'react-icons/ai';
 import styles from './students.module.css';
-import { useState, useEffect, FormEventHandler } from 'react';
+import { useState, useEffect, FormEventHandler, useRef, Dispatch } from 'react';
 import Modal from '../components/Modal';
 
 interface Student {
@@ -11,38 +11,59 @@ interface Student {
     subject: String
 }
 
-function AddStudent() {
+interface AddStudentProps {
+    getStudents: () => void
+}
+
+function AddStudent({ getStudents }: AddStudentProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newStudent, setNewStudent] = useState({name: '', subject: ''});
+    const [name, setName] = useState("");
+    const [subject, setSubject] = useState("");
+
+    function closeModal() {
+        setIsModalOpen(false);
+        setName("");
+        setSubject("");
+    }
 
     const handleSubmitNewStudent: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
+
+        const newStudent = {
+            name: name,
+            subject: subject
+        }
+
         console.log(newStudent);
         fetch("http://localhost:3000/api/students", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newStudent)
+        }).then(() => {
+            getStudents();
         });
-        setIsModalOpen(false);
+        closeModal();
     }
 
     return (
         <>
             <button className="btn btn-outline w-full" onClick={() => setIsModalOpen(true)}>Add New Student <AiOutlinePlus size={20} /></button>
-            <Modal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+            <Modal isModalOpen={isModalOpen} closeModal={closeModal}>
                 <form onSubmit={handleSubmitNewStudent}>
                     <h3 className="font-bold text-lg">Add New Student</h3>
                     <div className="modal-action flex justify-center">
                         <input
-                            onChange={e => setNewStudent({...newStudent, name: e.target.value})} 
+                            value={name}
+                            onChange={e => {setName(e.target.value)}} 
                             type="text" 
                             placeholder="Name" 
                             className="input input-bordered w-full" 
                         />
                     </div>
                     <div className="modal-action">
-                        <input 
-                            onChange={e => setNewStudent({...newStudent, subject: e.target.value})} 
+                        <input
+                            value={subject} 
+                            onChange={e => {setSubject(e.target.value)}}
                             type="text" 
                             placeholder="Subject" 
                             className="input input-bordered w-full" />
@@ -71,15 +92,19 @@ function StudentInfo({student} : {student: Student}) {
     )
 }
 
+
 export default function Students() {
     const [index, setIndex] = useState(0);
     const [students, setStudents] = useState([]);
 
-    useEffect(() => {
+    async function getStudents() {
         fetch("http://localhost:3000/api/students")
         .then(response => response.json())
-        .then(data => setStudents(data)
-    );
+        .then(data => setStudents(data))
+    }
+
+    useEffect(() => {
+        getStudents();
     }, []);
 
     console.log(students);
@@ -100,7 +125,7 @@ export default function Students() {
                         })
                     }
                 </ul>
-                <AddStudent />
+                <AddStudent getStudents={getStudents} />
             </div>
             <div className={styles.studentInfoSection}>
                 <StudentInfo student={student} />
