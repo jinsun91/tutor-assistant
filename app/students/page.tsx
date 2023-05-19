@@ -6,17 +6,22 @@ import styles from './students.module.css';
 import { useState, useEffect, FormEventHandler } from 'react';
 import Modal from '../components/Modal';
 
-interface Student {
+type Student = {
     id: number,
     name: String,
     subject: String
 }
 
-interface StudentProps {
-    getStudents: () => void
+interface ModifyStudentProps {
+    getStudents: () => Promise<void>,
+    student: Student
 }
 
-function AddStudent({ getStudents }: StudentProps) {
+interface AddStudentProps {
+    getStudents: () => Promise<void>,
+}
+
+function AddStudent({ getStudents }: AddStudentProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [name, setName] = useState("");
     const [subject, setSubject] = useState("");
@@ -36,7 +41,7 @@ function AddStudent({ getStudents }: StudentProps) {
         }
 
         console.log(newStudent);
-        fetch("http://localhost:3000/api/students", {
+        fetch("/api/students", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newStudent)
@@ -79,11 +84,11 @@ function AddStudent({ getStudents }: StudentProps) {
     );
 }
 
-function DeleteStudent({student, getStudents} : {student: Student, getStudents: () => void}) {
+function DeleteStudent({getStudents, student}: ModifyStudentProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     function handleDelete() {
-        fetch(`http://localhost:3000/api/students/${student.id}`, {
+        fetch(`/api/students/${student.id}`, {
             method: "DELETE",
         }).then(() => {
             getStudents();
@@ -106,10 +111,10 @@ function DeleteStudent({student, getStudents} : {student: Student, getStudents: 
     );
 }
 
-function EditStudent({student, getStudents} : {student: Student, getStudents: () => void}) {
+function EditStudent({getStudents, student}: ModifyStudentProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [name, setName] = useState(student.name + "");
-    const [subject, setSubject] = useState(student.subject + "");
+    const [name, setName] = useState(student.name.valueOf());
+    const [subject, setSubject] = useState(student.subject.valueOf());
 
     const handleEdit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -121,7 +126,7 @@ function EditStudent({student, getStudents} : {student: Student, getStudents: ()
         
         closeModal();
 
-        fetch(`http://localhost:3000/api/students/${student.id}`, {
+        fetch(`/api/students/${student.id}`, {
             method: "PUT",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(editStudent)
@@ -132,8 +137,8 @@ function EditStudent({student, getStudents} : {student: Student, getStudents: ()
 
     function openModal() {
         setIsModalOpen(true);
-        setName(student.name + "");
-        setSubject(student.subject + "");
+        setName(student.name.valueOf());
+        setSubject(student.subject.valueOf());
     }
 
     function closeModal() {
@@ -175,7 +180,7 @@ function EditStudent({student, getStudents} : {student: Student, getStudents: ()
     )
 }
 
-function StudentInfo({student, getStudents} : {student: Student, getStudents: () => void}) {
+function StudentInfo({getStudents, student}: ModifyStudentProps) {
     if (!student) {
         return (<></>)
     }
@@ -193,13 +198,12 @@ function StudentInfo({student, getStudents} : {student: Student, getStudents: ()
     )
 }
 
-
 export default function Students() {
     const [index, setIndex] = useState(-1);
     const [students, setStudents] = useState([]);
 
     async function getStudents() {
-        fetch("http://localhost:3000/api/students")
+        fetch("/api/students")
         .then(response => response.json())
         .then(data => setStudents(data))
     }
