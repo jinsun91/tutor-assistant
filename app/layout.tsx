@@ -14,17 +14,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header>
-          <div className="header-info">
-            <Link href="/"><h1 className="main-logo">Tutor Assistant</h1></Link>
-            <nav>
-              <Link href="/students">Students</Link>
-            </nav>
-          </div>
-        </header>
-        <main>
-          {children}
-        </main>
+          <header>
+            <div className="header-info">
+              <Link href="/"><h1 className="main-logo">Tutor Assistant</h1></Link>
+              <nav>
+                <Link href="/students" className="nav-item">Students</Link>
+                <Link href="/finances" className="nav-item">Finances</Link>
+              </nav>
+            </div>
+          </header>
+          <main>
+            {children}
+          </main>
       </body>
     </html>
   )

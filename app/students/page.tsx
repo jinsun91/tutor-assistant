@@ -18,7 +18,7 @@ interface ModifyStudentProps {
 }
 
 interface AddStudentProps {
-    getStudents: () => Promise<void>,
+    getStudents: () => Promise<void>
 }
 
 function AddStudent({ getStudents }: AddStudentProps) {
@@ -223,7 +223,7 @@ export default function Students() {
     return (
         <div className={styles.container}>
             <div className={`${styles.studentListSection}`}>
-                <ul className={`menu bg-base-100 ${styles.studentList}`}>
+                <ul className={`menu bg-base-100 overflow-y-scroll ${styles.studentList}`}>
                     { 
                         students.map(({id, name}: Student, i: number) => {
                             return <li key={id} className="w-full" onClick={() => handleClick(i)}><a className={index === i ? "active" : ""}>{name}</a></li>
