@@ -8,8 +8,8 @@ import Modal from '../components/Modal';
 
 type Student = {
     id: number,
-    name: String,
-    subject: String
+    name: string,
+    subject: string
 }
 
 interface ModifyStudentProps {
@@ -113,8 +113,8 @@ function DeleteStudent({getStudents, student}: ModifyStudentProps) {
 
 function EditStudent({getStudents, student}: ModifyStudentProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [name, setName] = useState(student.name.valueOf());
-    const [subject, setSubject] = useState(student.subject.valueOf());
+    const [name, setName] = useState(student.name);
+    const [subject, setSubject] = useState(student.subject);
 
     const handleEdit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -137,8 +137,8 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
 
     function openModal() {
         setIsModalOpen(true);
-        setName(student.name.valueOf());
-        setSubject(student.subject.valueOf());
+        setName(student.name);
+        setSubject(student.subject);
     }
 
     function closeModal() {

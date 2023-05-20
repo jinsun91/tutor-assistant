@@ -4,24 +4,51 @@ import styles from './finances.module.css';
 import Modal from '../components/Modal';
 import { useState, useEffect, FormEventHandler } from 'react';
 
+type Student = {
+    id: number,
+    name: string,
+    subject: string
+}
+
+type IncomeEntry = {
+    id: number,
+    date: string,
+    name: string,
+    amount: number,
+    received: number
+}
+
 interface AddIncomeProps {
     getFinances: () => Promise<void>
 }
 
 function AddIncome({ getFinances }: AddIncomeProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [date, setDate] = useState(new Date());
-    const [studentId, setStudentId] = useState(null);
+    const [date, setDate] = useState("");
+    const [studentId, setStudentId] = useState(-1);
     const [amount, setAmount] = useState(0);
-    const [received, setReceived] = useState(false);
+    const [received, setReceived] = useState(0);
+    const [students, setStudents] = useState([]);
+
+    async function getStudents() {
+        fetch("/api/students")
+        .then(response => response.json())
+        .then(data => setStudents(data))
+    }
+
+    useEffect(() => {
+        getStudents();
+    }, []);
 
     function closeModal() {
         setIsModalOpen(false);
-        setDate(new Date());
-        setStudentId(null);
+        setDate("");
+        setStudentId(-1);
         setAmount(0);
-        setReceived(false);
+        setReceived(0);
     }
+
+    console.log(students);
 
     const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -32,7 +59,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
             amount: amount,
             received: received
         }
-
+        
         console.log(income);
         fetch("/api/finances", {
             method: "POST",
@@ -44,22 +71,49 @@ function AddIncome({ getFinances }: AddIncomeProps) {
         closeModal();
     }
 
-    function handleDateChange() {
-        
-    }
-
     return (
         <>
             <button className="btn btn-success" onClick={() => setIsModalOpen(true)}>Add Income</button>
             <Modal isModalOpen={isModalOpen}>
-                <form onSubmit={handleAdd}>
+                <form onSubmit={handleAdd} className="w-full">
                     <h3 className="font-bold text-lg">Add New Income</h3>
-                    <div className="modal-action">
-                        
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Student</span>
+                        </label>
+                        <select className="select select-bordered w-full max-w-xs" defaultValue={-1} value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                            <option value={-1} disabled>Choose Student</option>
+                            {
+                                students.map((student: Student) => {
+                                    return <option key={student.id} value={student.id}>{student.name}</option>
+                                })
+                            }
+                        </select>
+                    </div>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Date</span>
+                        </label>
+                        <input type="text" value={date} placeholder="YYYY-MM-DD" onChange={e => {setDate(e.target.value)}}  className="input input-md input-bordered w-full max-w-xs" />
+                    </div>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Amount (KRW)</span>
+                        </label>
+                        <input type="number" value={amount} placeholder="Enter Amount" onChange={e => {setAmount(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
+                    </div>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Received</span>
+                        </label>
+                        <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                            <option key={0} value={0}>No</option>
+                            <option key={1} value={1}>Yes</option>
+                        </select>
                     </div>
                     <div className="modal-action">
                         <button type="reset" className="btn btn-ghost" onClick={closeModal}>Cancel</button>
-                        <button type="submit" className="btn">Add Income</button>
+                        <button type="submit" className="btn">Add</button>
                     </div>
                 </form>
             </Modal>
@@ -80,6 +134,8 @@ export default function Finances() {
         getFinances();
     }, []);
 
+    console.log(finances);
+
     return (
         <div className={styles.container}>
             <div className={styles.financeActions}>
@@ -90,18 +146,24 @@ export default function Finances() {
                     <thead>
                         <tr>
                             <th>Date</th> 
-                            <th>Name</th> 
+                            <th>Student</th> 
                             <th>Amount (KRW)</th> 
                             <th>Received</th> 
                         </tr>
                     </thead> 
                     <tbody>
-                        <tr>
-                            <th>05/19/2023</th> 
-                            <td>Jane</td> 
-                            <td>50,000</td> 
-                            <td>No</td> 
-                        </tr>
+                        {
+                            finances.map((value: IncomeEntry, index) => {
+                                return (
+                                    <tr key={index}>
+                                        <td>{value.date.split("T")[0]}</td>
+                                        <td>{value.name}</td>
+                                        <td>{value.amount}</td>
+                                        <td>{value.received === 0 ? "No" : "Yes"}</td>
+                                    </tr>
+                                )
+                            })
+                        }
                     </tbody> 
                 </table>
             </div>
