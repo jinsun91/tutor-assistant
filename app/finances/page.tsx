@@ -2,6 +2,8 @@
 
 import styles from './finances.module.css';
 import Modal from '../components/Modal';
+import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi';
+import { ImCheckmark2 } from 'react-icons/im';
 import { useState, useEffect, FormEventHandler } from 'react';
 
 type Student = {
@@ -16,6 +18,11 @@ type IncomeEntry = {
     name: string,
     amount: number,
     received: number
+}
+
+interface ModifyIncomeProps {
+    getFinances: () => Promise<void>,
+    incomeEntry: IncomeEntry
 }
 
 interface AddIncomeProps {
@@ -81,7 +88,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
                         <label className="label">
                             <span className="label-text">Student</span>
                         </label>
-                        <select className="select select-bordered w-full max-w-xs" defaultValue={-1} value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                        <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
                             <option value={-1} disabled>Choose Student</option>
                             {
                                 students.map((student: Student) => {
@@ -121,6 +128,43 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     )
 }
 
+function DeleteIncome({getFinances, incomeEntry}: ModifyIncomeProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    function handleDelete() {
+        console.log(incomeEntry);
+        fetch(`/api/finances/${incomeEntry.id}`, {
+            method: "DELETE",
+        }).then(() => {
+            getFinances();
+        });
+        setIsModalOpen(false);
+    }
+
+    return (
+        <>
+            <div className="tooltip" data-tip="Delete">
+                <HiOutlineTrash cursor="pointer" size={24} className="text-orange-500" onClick={() => setIsModalOpen(true)}/>
+            </div>
+            <Modal isModalOpen={isModalOpen}>
+                <h3 className="font-bold text-lg text-center">Are you sure you want to delete this?</h3>
+                <div className="text-center">
+                    <div className="my-5 inline-block text-left">
+                        <p><b>Date: </b>{incomeEntry.date}</p>
+                        <p><b>Student: </b>{incomeEntry.name}</p>
+                        <p><b>Amount: </b>{incomeEntry.amount} KRW</p>
+                        <p><b>Received: </b>{incomeEntry.received === 0 ? "No" : "Yes"}</p>
+                    </div>
+                </div>
+                <div className="flex justify-center">
+                    <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                    <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I'm sure</button>
+                </div>
+            </Modal>
+        </>
+    )
+}
+
 export default function Finances() {
     const [finances, setFinances] = useState([]);
 
@@ -148,18 +192,25 @@ export default function Finances() {
                             <th>Date</th> 
                             <th>Student</th> 
                             <th>Amount (KRW)</th> 
-                            <th>Received</th> 
+                            <th>Received</th>
+                            <th>Actions</th> 
                         </tr>
                     </thead> 
                     <tbody>
                         {
                             finances.map((value: IncomeEntry, index) => {
                                 return (
-                                    <tr key={index}>
+                                    <tr className="bg-red-200" key={index}>
                                         <td>{value.date.split("T")[0]}</td>
                                         <td>{value.name}</td>
                                         <td>{value.amount}</td>
-                                        <td>{value.received === 0 ? "No" : "Yes"}</td>
+                                        <td className={value.received === 0 ? "bg-red-200" : "bg-green-200"}>{value.received === 0 ? "No" : "Yes"}</td>
+                                        <td className="flex gap-5">
+                                            <div className="tooltip" data-tip="Edit">
+                                                <HiOutlinePencil cursor="pointer" size={24} className="text-blue-500"/>
+                                            </div>
+                                            <DeleteIncome getFinances={getFinances} incomeEntry={value}/>
+                                        </td>
                                     </tr>
                                 )
                             })

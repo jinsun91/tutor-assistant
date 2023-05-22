@@ -2,8 +2,7 @@ import { getConnection } from '../../../utils/db';
 
 export async function GET() {
   const connection = await getConnection();
-  const [rows] = await connection.execute("SELECT finances.date, students.name, finances.amount, finances.received FROM finances INNER JOIN students ON finances.student_id = students.id ORDER BY finances.date");
-  console.log(rows);
+  const [rows] = await connection.execute("SELECT finances.id, finances.date, students.name, finances.amount, finances.received FROM finances INNER JOIN students ON finances.student_id = students.id ORDER BY finances.date");
   return new Response(JSON.stringify(rows));
 }
 
