@@ -123,8 +123,6 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
             name: name,
             subject: subject
         }
-        
-        closeModal();
 
         fetch(`/api/students/${student.id}`, {
             method: "PUT",
@@ -133,18 +131,14 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
         }).then(() => {
             getStudents();
         });
+
+        setIsModalOpen(false);
     }
 
     function openModal() {
         setIsModalOpen(true);
         setName(student.name);
         setSubject(student.subject);
-    }
-
-    function closeModal() {
-        setIsModalOpen(false);
-        setName("");
-        setSubject("");
     }
 
     return (
@@ -171,7 +165,7 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
                             className="input input-bordered w-full" />
                     </div>
                     <div className="modal-action">
-                        <button type="reset" className="btn btn-ghost" onClick={closeModal}>Cancel</button>
+                        <button type="reset" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
                         <button type="submit" className="btn">Save Changes</button>
                     </div>
                 </form>
