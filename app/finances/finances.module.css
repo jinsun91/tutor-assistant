@@ -2,8 +2,25 @@
     height: 600px;
 }
 
-.financeActions {
+.topBar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 25px;
+}
+
+.filterActions {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.financeActionsContainer {
+    display: flex;
+    align-items: center;
+}
+
+.financeActionsButton {
+    
 }
