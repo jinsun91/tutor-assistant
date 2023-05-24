@@ -16,11 +16,15 @@
     padding: 20px;
 }
 
+.financeActionsOuterContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
 .financeActionsContainer {
     display: flex;
     align-items: center;
-}
-
-.financeActionsButton {
-    
+    margin-top: 20px;
 }
