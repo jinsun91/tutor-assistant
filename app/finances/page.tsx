@@ -6,6 +6,7 @@ import { addCommas } from '../../utils/formatting';
 import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { ImCheckmark, ImCross } from 'react-icons/im';
+import { BsTrash3Fill } from 'react-icons/bs';
 import { useState, useEffect, FormEventHandler, ChangeEvent } from 'react';
 
 type Student = {
@@ -27,6 +28,12 @@ type IncomeEntry = {
 interface EditIncomeProps {
     getFinances: () => Promise<void>,
     incomeEntry: IncomeEntry
+}
+
+interface DeleteIncomeProps {
+    getFinances: () => Promise<void>,
+    selectedEntries: IncomeEntry[],
+    setAllRowsSelected: (val: boolean) => void,
 }
 
 interface MarkReceivedProps {
@@ -140,36 +147,31 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     )
 }
 
-function DeleteIncome({getFinances, incomeEntries}) {
+function DeleteIncome({getFinances, selectedEntries, setAllRowsSelected}: DeleteIncomeProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const selectedEntriesIds = selectedEntries.map((entry) => entry.id);
+
     function handleDelete() {
-        // console.log(incomeEntry);
-        // fetch(`/api/finances/${incomeEntry.id}`, {
-        //     method: "DELETE",
-        // }).then(() => {
-        //     getFinances();
-        // });
-        // setIsModalOpen(false);
+        fetch("/api/finances/deletes", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(selectedEntriesIds),
+        }).then(() => {
+            getFinances();
+        });
+        setIsModalOpen(false);
     }
 
     return (
         <>
             <div className="tooltip" data-tip="Delete Income">
                 <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer">
-                    <HiOutlineTrash cursor="pointer" size={24} className="text-red-500" onClick={() => setIsModalOpen(true)}/>
+                    <BsTrash3Fill cursor="pointer" size={23} className="text-gray-500" onClick={() => setIsModalOpen(true)}/>
                 </div>
             </div>
             <Modal isModalOpen={isModalOpen}>
-                <h3 className="font-bold text-lg text-center">Are you sure you want to delete this?</h3>
-                <div className="text-center">
-                    <div className="my-5 inline-block text-left">
-                        {/* <p><b>Date: </b>{incomeEntry.date}</p>
-                        <p><b>Student: </b>{incomeEntry.student_name}</p>
-                        <p><b>Amount: </b>{incomeEntry.amount} KRW</p>
-                        <p><b>Received: </b>{incomeEntry.received === 0 ? "No" : "Yes"}</p> */}
-                    </div>
-                </div>
+                <h3 className="font-bold text-lg text-center">Are you sure you want to delete {selectedEntries.length} {selectedEntries.length == 1 ? "item" : "items"}?</h3>
                 <div className="flex justify-center">
                     <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
                     <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I'm sure</button>
@@ -205,7 +207,7 @@ function MarkReceived({isReceived, getFinances, selectedEntries, setAllRowsSelec
         <>
             <div className="tooltip" data-tip={isReceived === 0 ? "Mark as Not Received" : "Mark as Received"}>
                 <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer" onClick={handleMarkReceived}>
-                    { isReceived === 0 ? <ImCross size={24} className="text-red-500" /> : <ImCheckmark size={24} className="text-green-500" />}
+                    { isReceived === 0 ? <ImCross size={23} className="text-red-500" /> : <ImCheckmark size={23} className="text-green-500" />}
                 </div>
             </div>
         </>
@@ -368,10 +370,10 @@ export default function Finances() {
     return (
         <div className={styles.container}>
             <div className={styles.topBar}>
-                <div className="stats shadow mr-5">
+                <div className="stats shadow mr-5 mb-5">
                     <div className="stat">
                         <div className="stat-title">Total</div>
-                        <div className="stat-value">{addCommas(finances.reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW</div>
+                        <div className="stat-value mt-2">{addCommas(finances.reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW</div>
                         <div className="mt-3">
                             <div className="stat-desc text-green-500 mr-8">{addCommas(finances.filter((income: IncomeEntry) => income.received === 1).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW received</div>
                             <div className="stat-desc text-red-500">{addCommas(finances.filter((income: IncomeEntry) => income.received === 0).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW not received</div>
@@ -410,8 +412,7 @@ export default function Finances() {
                     <div className={styles.financeActionsContainer}>
                         <MarkReceived isReceived={1} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                         <MarkReceived isReceived={0} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
-                        {/* <EditIncome getFinances={getFinances} incomeEntries={selected} />
-                        <DeleteIncome getFinances={getFinances} incomeEntries={selected}/> */}
+                        <DeleteIncome getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                     </div>
                 </div>
             </div>

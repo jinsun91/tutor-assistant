@@ -6,7 +6,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
 }
 
 .filterActions {
@@ -19,12 +18,15 @@
 .financeActionsOuterContainer {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: flex-end;
+    height: 100%;
 }
 
 .financeActionsContainer {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     margin-top: 20px;
+    height:100%;
+    margin-bottom: -45px;
 }
