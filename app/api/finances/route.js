@@ -17,6 +17,6 @@ export async function PUT(request) {
   const res = await request.json();
   console.log(res);
   const connection = await getConnection();
-  const [rows] = await connection.execute(`UPDATE finances SET received = 1 WHERE id IN (${res.join(", ")})`);
+  const [rows] = await connection.execute(`UPDATE finances SET received = ${res.isReceived} WHERE id IN (${res.selectedEntries.join(", ")})`);
   return new Response(JSON.stringify(rows));
 }

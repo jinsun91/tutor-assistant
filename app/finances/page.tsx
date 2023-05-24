@@ -5,7 +5,7 @@ import Modal from '../components/Modal';
 import { addCommas } from '../../utils/formatting';
 import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi';
 import { AiOutlinePlus } from 'react-icons/ai';
-import { ImCheckmark2 } from 'react-icons/im';
+import { ImCheckmark, ImCross } from 'react-icons/im';
 import { useState, useEffect, FormEventHandler, ChangeEvent } from 'react';
 
 type Student = {
@@ -24,12 +24,13 @@ type IncomeEntry = {
     isSelected: boolean
 }
 
-interface ModifyIncomeProps {
+interface EditIncomeProps {
     getFinances: () => Promise<void>,
-    selectedEntries: IncomeEntry[]
+    incomeEntry: IncomeEntry
 }
 
 interface MarkReceivedProps {
+    isReceived: number,
     getFinances: () => Promise<void>,
     selectedEntries: IncomeEntry[],
     setAllRowsSelected: (val: boolean) => void,
@@ -139,7 +140,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     )
 }
 
-function DeleteIncome({getFinances, incomeEntries}: ModifyIncomeProps) {
+function DeleteIncome({getFinances, incomeEntries}) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     function handleDelete() {
@@ -159,103 +160,110 @@ function DeleteIncome({getFinances, incomeEntries}: ModifyIncomeProps) {
                     <HiOutlineTrash cursor="pointer" size={24} className="text-red-500" onClick={() => setIsModalOpen(true)}/>
                 </div>
             </div>
-            {/* <Modal isModalOpen={isModalOpen}>
+            <Modal isModalOpen={isModalOpen}>
                 <h3 className="font-bold text-lg text-center">Are you sure you want to delete this?</h3>
                 <div className="text-center">
                     <div className="my-5 inline-block text-left">
-                        <p><b>Date: </b>{incomeEntry.date}</p>
+                        {/* <p><b>Date: </b>{incomeEntry.date}</p>
                         <p><b>Student: </b>{incomeEntry.student_name}</p>
                         <p><b>Amount: </b>{incomeEntry.amount} KRW</p>
-                        <p><b>Received: </b>{incomeEntry.received === 0 ? "No" : "Yes"}</p>
+                        <p><b>Received: </b>{incomeEntry.received === 0 ? "No" : "Yes"}</p> */}
                     </div>
                 </div>
                 <div className="flex justify-center">
                     <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
                     <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I'm sure</button>
                 </div>
-            </Modal> */}
+            </Modal>
         </>
     )
 }
 
-function MarkReceived({getFinances, selectedEntries, setAllRowsSelected}: MarkReceivedProps) {
+function MarkReceived({isReceived, getFinances, selectedEntries, setAllRowsSelected}: MarkReceivedProps) {
+
     function handleMarkReceived() {
-        const selectedEntriesIds = selectedEntries.map((entry) => entry.id);
-        fetch("/api/finances", {
-            method: "PUT",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(selectedEntriesIds)
-        }).then(() => {
-            getFinances();
-        });
-        setAllRowsSelected(false);
+        if (selectedEntries.length > 0) {
+            const selectedEntriesIds = selectedEntries.map((entry) => entry.id);
+
+            const requestPayload = {
+                isReceived: isReceived,
+                selectedEntries: selectedEntriesIds
+            }
+
+            fetch("/api/finances", {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(requestPayload),
+            }).then(() => {
+                getFinances();
+            });
+            setAllRowsSelected(false);
+        }
     }
-
-    return (
-        <div className="tooltip" data-tip="Mark as Received">
-            <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer" onClick={handleMarkReceived}>
-                <ImCheckmark2 size={24} className="text-green-500" />
-            </div>
-        </div>
-    )
-}
-
-function EditIncome({getFinances, selectedEntries}: ModifyIncomeProps) {
-    // const [isModalOpen, setIsModalOpen] = useState(false);
-    // const [date, setDate] = useState(incomeEntry.date);
-    // const [studentId, setStudentId] = useState(incomeEntry.student_id);
-    // const [amount, setAmount] = useState(incomeEntry.amount);
-    // const [received, setReceived] = useState(incomeEntry.received);
-    // const [students, setStudents] = useState([]);
-
-    // async function getStudents() {
-    //     fetch("/api/students")
-    //     .then(response => response.json())
-    //     .then(data => setStudents(data))
-    // }
-
-    // useEffect(() => {
-    //     getStudents();
-    // }, []);
-
-    function openModal() {
-        // setIsModalOpen(true);
-        // setDate(incomeEntry.date);
-        // setStudentId(incomeEntry.student_id);
-        // setAmount(incomeEntry.amount);
-        // setReceived(incomeEntry.received);
-    }
-
-    // const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
-    //     e.preventDefault();
-
-    //     const editIncome = {
-    //         date: date,
-    //         student_id: studentId,
-    //         amount: amount,
-    //         received: received
-    //     }
-
-    //     console.log(editIncome);
-        // fetch(`/api/finances/${incomeEntry.id}`, {
-        //     method: "PUT",
-        //     headers: {"Content-Type": "application/json"},
-        //     body: JSON.stringify(editIncome)
-        // }).then(() => {
-        //     getFinances();
-        // });
-
-    //     setIsModalOpen(false);
-    // }
 
     return (
         <>
-            <div className="tooltip" data-tip="Edit Income">
-                <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer">
-                    <HiOutlinePencil cursor="pointer" size={24} className="text-blue-500" onClick={openModal}/>
+            <div className="tooltip" data-tip={isReceived === 0 ? "Mark as Not Received" : "Mark as Received"}>
+                <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer" onClick={handleMarkReceived}>
+                    { isReceived === 0 ? <ImCross size={24} className="text-red-500" /> : <ImCheckmark size={24} className="text-green-500" />}
                 </div>
             </div>
-            {/* <Modal isModalOpen={isModalOpen}>
+        </>
+    )
+}
+
+function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [date, setDate] = useState(incomeEntry.date);
+    const [studentId, setStudentId] = useState(incomeEntry.student_id);
+    const [amount, setAmount] = useState(incomeEntry.amount);
+    const [received, setReceived] = useState(incomeEntry.received);
+    const [students, setStudents] = useState([]);
+
+    async function getStudents() {
+        fetch("/api/students")
+        .then(response => response.json())
+        .then(data => setStudents(data))
+    }
+
+    useEffect(() => {
+        getStudents();
+    }, []);
+
+    function openModal() {
+        setIsModalOpen(true);
+        setDate(incomeEntry.date);
+        setStudentId(incomeEntry.student_id);
+        setAmount(incomeEntry.amount);
+        setReceived(incomeEntry.received);
+    }
+
+    const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+
+        const editIncome = {
+            date: date,
+            student_id: studentId,
+            amount: amount,
+            received: received
+        }
+
+        console.log(editIncome);
+        fetch(`/api/finances/${incomeEntry.id}`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(editIncome)
+        }).then(() => {
+            getFinances();
+        });
+
+        setIsModalOpen(false);
+    }
+
+    return (
+        <>
+            <HiOutlinePencil cursor="pointer" size={20} className="text-blue-500" onClick={openModal}/>
+            <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleAdd} className="w-full">
                     <h3 className="font-bold text-lg">Edit Income</h3>
                     <div className="modal-action w-full">
@@ -297,7 +305,7 @@ function EditIncome({getFinances, selectedEntries}: ModifyIncomeProps) {
                         <button type="submit" className="btn">Save Changes</button>
                     </div>
                 </form>
-            </Modal> */}
+            </Modal>
         </>
     )
 }
@@ -364,7 +372,7 @@ export default function Finances() {
                     <div className="stat">
                         <div className="stat-title">Total</div>
                         <div className="stat-value">{addCommas(finances.reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW</div>
-                        <div className="flex">
+                        <div className="mt-3">
                             <div className="stat-desc text-green-500 mr-8">{addCommas(finances.filter((income: IncomeEntry) => income.received === 1).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW received</div>
                             <div className="stat-desc text-red-500">{addCommas(finances.filter((income: IncomeEntry) => income.received === 0).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW not received</div>
                         </div>
@@ -400,7 +408,8 @@ export default function Finances() {
                 <div className={styles.financeActionsOuterContainer}>
                     <AddIncome getFinances={getFinances} />
                     <div className={styles.financeActionsContainer}>
-                        <MarkReceived getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
+                        <MarkReceived isReceived={1} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
+                        <MarkReceived isReceived={0} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                         {/* <EditIncome getFinances={getFinances} incomeEntries={selected} />
                         <DeleteIncome getFinances={getFinances} incomeEntries={selected}/> */}
                     </div>
@@ -419,6 +428,7 @@ export default function Finances() {
                             <th>Student</th> 
                             <th>Amount (KRW)</th> 
                             <th>Received</th>
+                            <th>Edit</th>
                         </tr>
                     </thead> 
                     <tbody>
@@ -435,6 +445,7 @@ export default function Finances() {
                                         <td>{value.student_name}</td>
                                         <td>{addCommas(value.amount)}</td>
                                         <td className={value.received === 0 ? "bg-red-200" : "bg-green-200"}>{value.received === 0 ? "No" : "Yes"}</td>
+                                        <td><EditIncome getFinances={getFinances} incomeEntry={value} /></td>
                                     </tr>
                                 )
                             })
