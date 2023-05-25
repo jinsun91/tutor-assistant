@@ -18,6 +18,7 @@ export default function RootLayout({
             <div className="header-info">
               <Link href="/"><h1 className="main-logo">Tutor Assistant</h1></Link>
               <nav>
+                <Link href="/calendar" className="nav-item">Calendar</Link>
                 <Link href="/students" className="nav-item">Students</Link>
                 <Link href="/finances" className="nav-item">Finances</Link>
               </nav>
