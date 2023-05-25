@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-          <header>
+          <header className="main-header">
             <div className="header-info">
               <Link href="/"><h1 className="main-logo">Tutor Assistant</h1></Link>
               <nav>
