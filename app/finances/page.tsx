@@ -98,7 +98,6 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     return (
         <>
             <button className="btn btn-sm btn-outline btn-info" onClick={openModal}>Add Income</button>
-            {/* <button className="btn btn-success" onClick={openModal}>Add Income <AiOutlinePlus size={20}/></button> */}
             <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleAdd} className="w-full">
                     <h3 className="font-bold text-lg">Add New Income</h3>
@@ -333,15 +332,10 @@ export default function Finances() {
             const rows = data.map((value: IncomeEntry) => {
                 return {...value, isSelected: false}
             });
-            console.log("ROWS");
-            console.log(rows);
             setFinances(rows);
-            console.log("HERE");
-            console.log(filterEntries(year, month, studentId, rows));
             setFilteredFinances(filterEntries(year, month, studentId, rows));
         })
     }
-
 
     useEffect(() => {
         getFinances();

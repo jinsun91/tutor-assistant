@@ -1,0 +1,17 @@
+.calendar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 700px;
+}
+
+.calendarHeaderContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.calendarActions {
+    display: flex;
+    align-items: center;
+}
