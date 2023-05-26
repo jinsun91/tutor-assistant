@@ -6,6 +6,7 @@ export async function DELETE(request, context) {
   const connection = await getConnection();
   const [rows_students] = await connection.execute(`DELETE FROM students WHERE id = ${id}`);
   const [rows_finances] = await connection.execute(`DELETE FROM finances WHERE student_id = ${id}`);
+  const [rows_lessons] = await connection.execute(`DELETE FROM lessons WHERE student_id = ${id}`);
   return new Response(JSON.stringify({}));
 }
 

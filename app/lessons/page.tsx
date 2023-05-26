@@ -4,7 +4,7 @@ import { getMonth } from '../../utils/date';
 import { useState, Fragment, FormEventHandler, useEffect } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import styles from './calendar.module.css';
+import styles from './lessons.module.css';
 import Modal from '../components/Modal';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -27,9 +27,15 @@ type Student = {
 interface CalendarProps {
     monthIndex: number,
     lessons: Lesson[],
+    getLessons: () => Promise<void>
 }
 
 interface AddLessonProps {
+    getLessons: () => Promise<void>
+}
+
+interface LessonInfoProps {
+    lesson: Lesson,
     getLessons: () => Promise<void>
 }
 
@@ -57,13 +63,8 @@ function AddLesson({getLessons}: AddLessonProps) {
         setDuration(0);
     }
 
-    console.log(dateTime);
-
     const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
-
-        console.log("DATE TIME IS: ");
-        console.log(dateTime);
 
         const lesson = {
             student_id: studentId,
@@ -71,7 +72,6 @@ function AddLesson({getLessons}: AddLessonProps) {
             duration: duration
         }
         
-        console.log(lesson);
         fetch("/api/lessons", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -129,24 +129,112 @@ function AddLesson({getLessons}: AddLessonProps) {
     )
 }
 
-function Day({day, rowIndex}: {day: Dayjs, rowIndex: number}) {
-    function getCurrentDayClass() {
-        return day.format("DD-MM-YY") === dayjs().format("DD-MM-YY") ?
-            "bg-blue-600 text-white rounded-full w-7" : "";
+function LessonInfo({getLessons, lesson}: LessonInfoProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [studentId, setStudentId] = useState(lesson.student_id);
+    const [dateTime, setDateTime] = useState<Dayjs | null>(lesson.date_time);
+    const [duration, setDuration] = useState(lesson.duration);
+    const [students, setStudents] = useState([]);
+
+    async function getStudents() {
+        fetch("/api/students")
+        .then(response => response.json())
+        .then(data => setStudents(data))
     }
+
+    useEffect(() => {
+        getStudents();
+    }, []);
+
+    function openModal() {
+        setIsModalOpen(true);
+        setStudentId(lesson.student_id);
+        setDateTime(lesson.date_time);
+        setDuration(lesson.duration);
+    }
+
+    function handleDelete() {
+        fetch(`/api/lessons/${lesson.id}`, {
+            method: "DELETE",
+        }).then(() => {
+            getLessons();
+        });
+        setIsModalOpen(false);
+    }
+
+    const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+
+        const updatedLesson = {
+            student_id: studentId,
+            date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
+            duration: duration
+        }
+        
+        fetch(`/api/lessons/${lesson.id}`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(updatedLesson)
+        }).then(() => {
+            getLessons();
+        });
+        setIsModalOpen(false);
+    }
+
+    function handleDateTimeChange(newValue: Dayjs | null) {
+        if (newValue !== null) {
+            setDateTime(newValue);
+        }
+    }
+
     return (
-        <div className="border border-gray-200 flex flex-col">
-            <header className="flex flex-col items-left">
-                {rowIndex === 0 && (<p className="text-sm mt-1">{day.format('ddd').toUpperCase()}</p>)}
-                <p className={`text-sm p-1 my-1 text-left ${getCurrentDayClass()}`}>
-                    {day.format('DD')}
-                </p>
-            </header>
-        </div>
+        <>
+            <div className={styles.lessonInfoContainer} onClick={openModal}>
+                <p className={styles.lessonInfo}><b>{lesson.student_name}</b></p>
+                <p className={styles.lessonInfo}>{lesson.date_time.format("hh:mm a")}</p>
+            </div>
+            <Modal isModalOpen={isModalOpen}>
+                <label htmlFor="my-modal-3" className="btn btn-sm btn-circle absolute right-4 top-4" onClick={() => setIsModalOpen(false)}>✕</label>
+                <form onSubmit={handleAdd} className="w-full">
+                    <h3 className="font-bold text-lg">Lesson Information</h3>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Student</span>
+                        </label>
+                        <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                            <option value={-1} disabled>Choose Student</option>
+                            {
+                                students.map((student: Student) => {
+                                    return <option key={student.id} value={student.id}>{student.name}</option>
+                                })
+                            }
+                        </select>
+                    </div>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Date and Time</span>
+                        </label>
+                        <DateTimePicker className="w-full" value={dateTime} onChange={handleDateTimeChange}/>
+                    </div>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Lesson Duration</span>
+                        </label>
+                        <input type="number" value={duration} placeholder="Enter Amount" onChange={e => {setDuration(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
+                    </div>
+                    <div className="mt-5">
+                        <div className="flex justify-between">
+                            <button onClick={handleDelete} className="btn btn-outline btn-error btn-sm">Delete</button>
+                            <button type="submit" className="btn btn-outline btn-info btn-sm">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </Modal>
+        </>
     )
 }
 
-function Calendar({monthIndex, lessons}: CalendarProps) {
+function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
     function getCurrentDayClass(day: Dayjs) {
         return day.format("DD-MM-YY") === dayjs().format("DD-MM-YY") ?
             "bg-blue-600 text-white rounded-full w-7" : "";
@@ -175,7 +263,7 @@ function Calendar({monthIndex, lessons}: CalendarProps) {
                                             </header>
                                             <div>
                                                 { getDayLessons(day).map(lesson => {
-                                                    return <div>{lesson.student_name}</div>
+                                                    return <LessonInfo getLessons={getLessons} lesson={lesson} key={lesson.id}/>
                                                 })}
                                             </div>
                                         </div>
@@ -201,8 +289,6 @@ export default function Lessons() {
             const formattedData = data.map((lesson: Lesson) => {
                 return {...lesson, date_time: dayjs(lesson.date_time)}
             });
-            console.log("HERO");
-            console.log(formattedData);
             setLessons(formattedData);
         });
     }
@@ -230,7 +316,7 @@ export default function Lessons() {
                             <AddLesson getLessons={getLessons}/>
                         </div>
                     </header>
-                    <Calendar monthIndex={monthIndex} lessons={lessons} />
+                    <Calendar monthIndex={monthIndex} lessons={lessons} getLessons={getLessons} />
                 </div>
             </LocalizationProvider>
         </>
