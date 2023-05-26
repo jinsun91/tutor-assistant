@@ -15,7 +15,8 @@ type Lesson = {
     student_name: string,
     student_id: number,
     date_time: Dayjs,
-    duration: number
+    duration: number,
+    completed: number
 }
 
 type Student = {
@@ -44,6 +45,7 @@ function AddLesson({getLessons}: AddLessonProps) {
     const [studentId, setStudentId] = useState(-1);
     const [dateTime, setDateTime] = useState<Dayjs | null>(dayjs(Date.now()));
     const [duration, setDuration] = useState(0);
+    const [completed, setCompleted] = useState(0);
     const [students, setStudents] = useState([]);
 
     async function getStudents() {
@@ -61,6 +63,7 @@ function AddLesson({getLessons}: AddLessonProps) {
         setStudentId(-1);
         setDateTime(dayjs(Date.now()));
         setDuration(0);
+        setCompleted(0);
     }
 
     const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
@@ -69,7 +72,8 @@ function AddLesson({getLessons}: AddLessonProps) {
         const lesson = {
             student_id: studentId,
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
-            duration: duration
+            duration: duration,
+            completed: completed
         }
         
         fetch("/api/lessons", {
@@ -119,6 +123,15 @@ function AddLesson({getLessons}: AddLessonProps) {
                         </label>
                         <input type="number" value={duration} placeholder="Enter Amount" onChange={e => {setDuration(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
                     </div>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Completed</span>
+                        </label>
+                        <select value={completed} onChange={e => {setCompleted(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                            <option key={0} value={0}>No</option>
+                            <option key={1} value={1}>Yes</option>
+                        </select>
+                    </div>
                     <div className="modal-action">
                         <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
                         <button type="submit" className="btn">Add</button>
@@ -134,6 +147,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     const [studentId, setStudentId] = useState(lesson.student_id);
     const [dateTime, setDateTime] = useState<Dayjs | null>(lesson.date_time);
     const [duration, setDuration] = useState(lesson.duration);
+    const [completed, setCompleted] = useState(lesson.completed);
     const [students, setStudents] = useState([]);
 
     async function getStudents() {
@@ -151,6 +165,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
         setStudentId(lesson.student_id);
         setDateTime(lesson.date_time);
         setDuration(lesson.duration);
+        setCompleted(lesson.completed);
     }
 
     function handleDelete() {
@@ -168,7 +183,8 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
         const updatedLesson = {
             student_id: studentId,
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
-            duration: duration
+            duration: duration,
+            completed: completed
         }
         
         fetch(`/api/lessons/${lesson.id}`, {
@@ -222,6 +238,15 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
                         </label>
                         <input type="number" value={duration} placeholder="Enter Amount" onChange={e => {setDuration(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
                     </div>
+                    <div className="modal-action w-full">
+                        <label className="label">
+                            <span className="label-text">Completed</span>
+                        </label>
+                        <select value={completed} onChange={e => {setCompleted(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                            <option key={0} value={0}>No</option>
+                            <option key={1} value={1}>Yes</option>
+                        </select>
+                    </div>
                     <div className="mt-5">
                         <div className="flex justify-between">
                             <button onClick={handleDelete} className="btn btn-outline btn-error btn-sm">Delete</button>
@@ -234,15 +259,15 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     )
 }
 
+export function getDayLessons(lessons: Lesson[], day: Dayjs) {
+    const dayLessons = lessons.filter(lesson => dayjs(lesson.date_time).format("DD-MM-YY") === day.format("DD-MM-YY"));
+    return dayLessons;
+}
+
 function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
     function getCurrentDayClass(day: Dayjs) {
         return day.format("DD-MM-YY") === dayjs().format("DD-MM-YY") ?
             "bg-blue-600 text-white rounded-full w-7" : "";
-    }
-
-    function getDayLessons(day: Dayjs) {
-        const dayLessons = lessons.filter(lesson => dayjs(lesson.date_time).format("DD-MM-YY") === day.format("DD-MM-YY"));
-        return dayLessons;
     }
 
     return (
@@ -262,7 +287,7 @@ function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
                                                 </p>
                                             </header>
                                             <div>
-                                                { getDayLessons(day).map(lesson => {
+                                                { getDayLessons(lessons, day).map(lesson => {
                                                     return <LessonInfo getLessons={getLessons} lesson={lesson} key={lesson.id}/>
                                                 })}
                                             </div>

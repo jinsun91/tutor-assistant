@@ -1,0 +1,12 @@
+.todayLessonContainer {
+    width: 500px;
+    margin: 0 auto;
+}
+
+.todayLessonsSection {
+    width: 70%;
+}
+
+.todayEarningsSection {
+    width: 30%;
+}
