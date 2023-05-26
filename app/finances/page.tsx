@@ -474,7 +474,7 @@ export default function Finances() {
                         {
                             filteredFinances.map((value: IncomeEntry, index) => {
                                 return (
-                                    <tr className="bg-red-200" key={index}>
+                                    <tr key={index}>
                                         <td>
                                             <label>
                                                 <input type="checkbox" checked={value.isSelected} className="checkbox checkbox-sm" onChange={(e) => handleIncomeSelectChange(e, index, value)}/>

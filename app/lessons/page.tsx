@@ -1,7 +1,7 @@
 "use client"
 
 import { getMonth } from '../../utils/date';
-import { useState, Fragment, FormEventHandler, useEffect } from 'react';
+import { useState, Fragment, FormEventHandler, useEffect, ReactNode } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from './lessons.module.css';
@@ -10,7 +10,7 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
-type Lesson = {
+export type Lesson = {
     id: number,
     student_name: string,
     student_id: number,
