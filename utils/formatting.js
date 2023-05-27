@@ -36,7 +36,7 @@ export function calculateLessonIncome(rate, hours, mins) {
     if (total % 1 != 0) {
         total = total.toFixed(2);
     }
-    
+
     return total;
 }
 
@@ -44,8 +44,7 @@ export function formatIncome(number) {
     const decimalPart = number % 1;
   
     if (decimalPart === 0 && decimalPart.toFixed(2).slice(-2) === "00") {
-      return Math.trunc(number);
-    } else {
-      return number;
+        return Math.trunc(number);
     }
+    return number;
 }

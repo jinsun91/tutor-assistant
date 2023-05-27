@@ -7,11 +7,11 @@ import styles from './home.module.css'
 import { getDayLessons, Lesson } from './lessons/page';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { formatIncome, addCommas } from '../utils/formatting';
+import { formatIncome, formatDateTime, addCommas } from '../utils/formatting';
 
 interface LessonsTableProps {
   	todayLessons: Lesson[],
-	getLessons: () => Promise<void>
+	getLessons: () => Promise<void>,
 }
 
 function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
@@ -56,7 +56,7 @@ function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
 							<tr key={index}>
 								<td>{lesson.student_name}</td>
 								<td>{lesson.date_time.format("hh:mm A")}</td>
-								<td>{lesson.duration_hours} {lesson.duration_hours === 1 ? "hr" : "hrs"} {lesson.duration_mins} mins</td>
+								<td>{formatDateTime(lesson.duration_hours, lesson.duration_mins)}</td>
 								<td>${formatIncome(lesson.income)}</td>
 								<td className={lesson.completed === 0 ? "bg-red-200" : "bg-green-200"}>
 									<div className="flex justify-between items-center">
@@ -102,6 +102,10 @@ export default function Home() {
 				return {...lesson, date_time: dayjs(lesson.date_time)}
 			});
 			setLessons(formattedData);
+			const today = dayjs(Date.now());
+			const todayLessons = getDayLessons(formattedData, today);
+			console.log(todayLessons);
+			setTodayIncome(todayLessons.filter(lesson => lesson.completed === 1).reduce((acc, lesson: Lesson) => acc + lesson.income, 0));
 		});
 	}
 
@@ -125,7 +129,7 @@ export default function Home() {
 						<div className="stats shadow">
 							<div className="stat">
 								<div className="stat-title">Today's Income</div>
-								<div className="stat-value">{addCommas(todayLessons.reduce((acc, lesson: Lesson) => acc + lesson.completed === 1 ? lesson.income : 0, 0))}</div>
+								<div className="stat-value">${todayIncome}</div>
 							</div>
 						</div>
 						<button className="btn btn-success">Add Earnings to Finances</button>
