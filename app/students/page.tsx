@@ -5,6 +5,7 @@ import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi';
 import styles from './students.module.css';
 import { useState, useEffect, FormEventHandler } from 'react';
 import Modal from '../components/Modal';
+import { formatDateTime } from '../../utils/formatting';
 
 type Student = {
     id: number,
@@ -228,7 +229,7 @@ function StudentInfo({getStudents, student}: ModifyStudentProps) {
             <div className={styles.studentInfo}>
                 <p><span className="font-bold">Name: </span>{student.name}</p>
                 <p><span className="font-bold">Subject: </span>{student.subject}</p>
-                <p><span className="font-bold">Lesson Duration: </span>{student.lesson_duration_hours} {student.lesson_duration_hours === 1 ? "hr" : "hrs"} {student.lesson_duration_mins} mins</p>
+                <p><span className="font-bold">Lesson Duration: </span>{formatDateTime(student.lesson_duration_hours, student.lesson_duration_mins)}</p>
                 <p><span className="font-bold">Lesson Rate: </span>${student.lesson_rate} per hour</p>
             </div>
             <div className={styles.studentInfoActions}>

@@ -17,6 +17,7 @@ export type Lesson = {
     date_time: Dayjs,
     duration_hours: number,
     duration_mins: number,
+    income: number,
     completed: number
 }
 

@@ -10,3 +10,20 @@ export function addCommas(number) {
   
     return numberWithCommasFormatted;
 }
+
+export function formatDateTime(hours, mins) {
+    let formattedStr = "";
+    if (hours > 0) {
+        if (hours === 1) {
+            formattedStr += "1 hr ";
+        } else {
+            formattedStr += hours + " hrs ";
+        }
+    }
+
+    if (mins > 0) {
+        formattedStr += mins + " mins"
+    }
+
+    return formattedStr;
+}

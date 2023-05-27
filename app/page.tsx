@@ -5,9 +5,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import { ImCheckmark, ImCross } from 'react-icons/im';
 import styles from './home.module.css'
 import { getDayLessons, Lesson } from './lessons/page';
-import { HiPencil } from 'react-icons/hi';
-import Modal from './components/Modal';
-import { DateTimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
@@ -52,26 +49,28 @@ function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
 		)
   	}	
   	return (
-		<div className="overflow-x-auto">
-			<table className="table table-compact w-full">
-				<thead>
-				<tr>
-					<th>Student</th> 
-					<th>Time</th> 
-					<th>Duration</th> 
-					<th>Completed</th>
-				</tr>
-				</thead> 
-				<tbody>
-					{
-						todayLessons.map((lesson: Lesson, index) => {
-							return (
-								<tr key={index}>
-									<td>{lesson.student_name}</td>
-									<td>{lesson.date_time.format("hh:mm A")}</td>
-									<td>{lesson.duration_hours} {lesson.duration_hours === 1 ? "hr" : "hrs"} {lesson.duration_mins} mins</td>
-									<td className={lesson.completed === 0 ? "bg-red-200" : "bg-green-200"}>{lesson.completed === 1 ? "Yes" : "No"}</td>
-									<td>
+		<table className="table table-compact w-full">
+			<thead>
+			<tr>
+				<th>Student</th> 
+				<th>Time</th>
+				<th>Duration</th>
+				<th>Income</th>
+				<th>Completed</th>
+			</tr>
+			</thead> 
+			<tbody>
+				{
+					todayLessons.map((lesson: Lesson, index) => {
+						return (
+							<tr key={index}>
+								<td>{lesson.student_name}</td>
+								<td>{lesson.date_time.format("hh:mm A")}</td>
+								<td>{lesson.duration_hours} {lesson.duration_hours === 1 ? "hr" : "hrs"} {lesson.duration_mins} mins</td>
+								<td></td>
+								<td className={lesson.completed === 0 ? "bg-red-200" : "bg-green-200"}>
+									<div className="flex justify-between items-center">
+										{lesson.completed === 1 ? "Yes" : "No"}
 										<div className="flex">
 											{
 												lesson.completed === 0 && 
@@ -89,14 +88,14 @@ function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
 											</div>
 											}
 										</div>
-									</td>
-								</tr>
-							)
-						})
-					}
-				</tbody> 
-			</table>
-		</div>
+									</div>
+								</td>
+							</tr>
+						)
+					})
+				}
+			</tbody> 
+		</table>
   	)
 }
 
