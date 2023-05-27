@@ -15,7 +15,8 @@ export type Lesson = {
     student_name: string,
     student_id: number,
     date_time: Dayjs,
-    duration: number,
+    duration_hours: number,
+    duration_mins: number,
     completed: number
 }
 
@@ -44,7 +45,8 @@ function AddLesson({getLessons}: AddLessonProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentId, setStudentId] = useState(-1);
     const [dateTime, setDateTime] = useState<Dayjs | null>(dayjs(Date.now()));
-    const [duration, setDuration] = useState(0);
+    const [durationHours, setDurationHours] = useState(0);
+    const [durationMins, setDurationMins] = useState(0);
     const [completed, setCompleted] = useState(0);
     const [students, setStudents] = useState([]);
 
@@ -62,7 +64,8 @@ function AddLesson({getLessons}: AddLessonProps) {
         setIsModalOpen(true);
         setStudentId(-1);
         setDateTime(dayjs(Date.now()));
-        setDuration(0);
+        setDurationHours(0);
+        setDurationMins(0);
         setCompleted(0);
     }
 
@@ -72,7 +75,8 @@ function AddLesson({getLessons}: AddLessonProps) {
         const lesson = {
             student_id: studentId,
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
-            duration: duration,
+            duration_hours: durationHours,
+            duration_mins: durationMins,
             completed: completed
         }
         
@@ -94,47 +98,48 @@ function AddLesson({getLessons}: AddLessonProps) {
 
     return (
         <>
-            <button onClick={openModal} className="btn">Add Lesson</button>
+            <button onClick={openModal} className="btn btn-success">Add Lesson</button>
             <Modal isModalOpen={isModalOpen}>
-                <form onSubmit={handleAdd} className="w-full">
-                    <h3 className="font-bold text-lg">Add Lesson</h3>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Student</span>
-                        </label>
-                        <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
-                            <option value={-1} disabled>Choose Student</option>
-                            {
-                                students.map((student: Student) => {
-                                    return <option key={student.id} value={student.id}>{student.name}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Date and Time</span>
-                        </label>
-                        <DateTimePicker className="w-full" value={dateTime} onChange={handleDateTimeChange}/>
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Lesson Duration</span>
-                        </label>
-                        <input type="number" value={duration} placeholder="Enter Amount" onChange={e => {setDuration(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Completed</span>
-                        </label>
-                        <select value={completed} onChange={e => {setCompleted(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
-                            <option key={0} value={0}>No</option>
-                            <option key={1} value={1}>Yes</option>
-                        </select>
+                <form onSubmit={handleAdd} className="w-full px-2">
+                    <h3 className="font-bold text-lg mt-1 mb-3">Add Lesson</h3>
+                    <div className={styles.modalContainer}>
+                        <div className={styles.modalLabels}>Student</div>
+                        <div>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                                <option value={-1} disabled>Choose Student</option>
+                                {
+                                    students.map((student: Student) => {
+                                        return <option key={student.id} value={student.id}>{student.name}</option>
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <div className={styles.modalLabels}>Date and Time</div>
+                        <div>
+                            <DateTimePicker className="w-full" value={dateTime} onChange={handleDateTimeChange}/>
+                        </div>
+                        <div className={styles.modalLabels}>Duration</div>
+                        <div className="flex items-center">
+                            <label className="input-group">
+                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
+                                <span>hrs</span>
+                            </label>
+                            <label className="input-group flex-1">
+                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
+                                <span>mins</span>
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Completed</div>
+                        <div>
+                            <select value={completed} onChange={e => {setCompleted(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                                <option key={0} value={0}>No</option>
+                                <option key={1} value={1}>Yes</option>
+                            </select>
+                        </div>
                     </div>
                     <div className="modal-action">
                         <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                        <button type="submit" className="btn">Add</button>
+                        <button type="submit" className="btn btn-success">Add</button>
                     </div>
                 </form>
             </Modal>
@@ -146,7 +151,8 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentId, setStudentId] = useState(lesson.student_id);
     const [dateTime, setDateTime] = useState<Dayjs | null>(lesson.date_time);
-    const [duration, setDuration] = useState(lesson.duration);
+    const [durationHours, setDurationHours] = useState(lesson.duration_hours);
+    const [durationMins, setDurationMins] = useState(lesson.duration_mins);
     const [completed, setCompleted] = useState(lesson.completed);
     const [students, setStudents] = useState([]);
 
@@ -164,7 +170,8 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
         setIsModalOpen(true);
         setStudentId(lesson.student_id);
         setDateTime(lesson.date_time);
-        setDuration(lesson.duration);
+        setDurationHours(lesson.duration_hours);
+        setDurationMins(lesson.duration_mins);
         setCompleted(lesson.completed);
     }
 
@@ -183,7 +190,8 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
         const updatedLesson = {
             student_id: studentId,
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
-            duration: duration,
+            duration_hours: durationHours,
+            duration_mins: durationMins,
             completed: completed
         }
         
@@ -211,46 +219,47 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
             </div>
             <Modal isModalOpen={isModalOpen}>
                 <label htmlFor="my-modal-3" className="btn btn-sm btn-circle absolute right-4 top-4" onClick={() => setIsModalOpen(false)}>✕</label>
-                <form onSubmit={handleAdd} className="w-full">
-                    <h3 className="font-bold text-lg">Lesson Information</h3>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Student</span>
-                        </label>
-                        <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
-                            <option value={-1} disabled>Choose Student</option>
-                            {
-                                students.map((student: Student) => {
-                                    return <option key={student.id} value={student.id}>{student.name}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Date and Time</span>
-                        </label>
-                        <DateTimePicker className="w-full" value={dateTime} onChange={handleDateTimeChange}/>
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Lesson Duration</span>
-                        </label>
-                        <input type="number" value={duration} placeholder="Enter Amount" onChange={e => {setDuration(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Completed</span>
-                        </label>
-                        <select value={completed} onChange={e => {setCompleted(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
-                            <option key={0} value={0}>No</option>
-                            <option key={1} value={1}>Yes</option>
-                        </select>
+                <form onSubmit={handleAdd} className="w-full px-2">
+                    <h3 className="font-bold text-lg mt-1 mb-3">Lesson Information</h3>
+                    <div className={styles.modalContainer}>
+                        <div className={styles.modalLabels}>Student</div>
+                        <div>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                                <option value={-1} disabled>Choose Student</option>
+                                {
+                                    students.map((student: Student) => {
+                                        return <option key={student.id} value={student.id}>{student.name}</option>
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <div className={styles.modalLabels}>Date and Time</div>
+                        <div>
+                            <DateTimePicker className="w-full" value={dateTime} onChange={handleDateTimeChange}/>
+                        </div>
+                        <div className={styles.modalLabels}>Duration</div>
+                        <div className="flex items-center">
+                            <label className="input-group">
+                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
+                                <span>hrs</span>
+                            </label>
+                            <label className="input-group flex-1">
+                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
+                                <span>mins</span>
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Completed</div>
+                        <div>
+                            <select value={completed} onChange={e => {setCompleted(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                                <option key={0} value={0}>No</option>
+                                <option key={1} value={1}>Yes</option>
+                            </select>
+                        </div>
                     </div>
                     <div className="mt-5">
                         <div className="flex justify-between">
-                            <button onClick={handleDelete} className="btn btn-outline btn-error btn-sm">Delete</button>
-                            <button type="submit" className="btn btn-outline btn-info btn-sm">Save Changes</button>
+                            <button onClick={handleDelete} className="btn btn-error btn-sm">Delete</button>
+                            <button type="submit" className="btn btn-info btn-sm">Save Changes</button>
                         </div>
                     </div>
                 </form>
