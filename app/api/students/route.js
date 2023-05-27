@@ -9,6 +9,6 @@ export async function GET() {
 export async function POST(request) {
   const res = await request.json();
   const connection = await getConnection();
-  const [rows] = await connection.execute(`INSERT INTO students (name, subject) VALUES ('${res.name}', '${res.subject}')`);
+  const [rows] = await connection.execute(`INSERT INTO students (name, subject, lesson_duration_hours, lesson_duration_mins, lesson_rate) VALUES ('${res.name}', '${res.subject}', ${res.lesson_duration_hours}, ${res.lesson_duration_mins}, ${res.lesson_rate})`);
   return new Response(JSON.stringify(rows));
 }

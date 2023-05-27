@@ -9,7 +9,10 @@ import Modal from '../components/Modal';
 type Student = {
     id: number,
     name: string,
-    subject: string
+    subject: string,
+    lesson_duration_hours: number,
+    lesson_duration_mins: number,
+    lesson_rate: number
 }
 
 interface ModifyStudentProps {
@@ -25,11 +28,17 @@ function AddStudent({ getStudents }: AddStudentProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [name, setName] = useState("");
     const [subject, setSubject] = useState("");
+    const [durationHours, setDurationHours] = useState(0);
+    const [durationMins, setDurationMins] = useState(0);
+    const [rate, setRate] = useState(0);
 
-    function closeModal() {
-        setIsModalOpen(false);
+    function openModal() {
+        setIsModalOpen(true);
         setName("");
         setSubject("");
+        setDurationHours(0);
+        setDurationMins(0);
+        setRate(0);
     }
 
     const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
@@ -37,7 +46,10 @@ function AddStudent({ getStudents }: AddStudentProps) {
 
         const newStudent = {
             name: name,
-            subject: subject
+            subject: subject,
+            lesson_duration_hours: durationHours,
+            lesson_duration_mins: durationMins,
+            lesson_rate: rate
         }
 
         console.log(newStudent);
@@ -48,35 +60,47 @@ function AddStudent({ getStudents }: AddStudentProps) {
         }).then(() => {
             getStudents();
         });
-        closeModal();
+        setIsModalOpen(false);
     }
 
     return (
         <>
-            <button className="btn btn-outline btn-primary w-full" onClick={() => setIsModalOpen(true)}>Add New Student <AiOutlinePlus size={20} /></button>
+            <button className="btn btn-outline btn-primary w-full" onClick={openModal}>Add New Student <AiOutlinePlus size={20} /></button>
             <Modal isModalOpen={isModalOpen}>
-                <form onSubmit={handleAdd}>
-                    <h3 className="font-bold text-lg">Add New Student</h3>
-                    <div className="modal-action flex justify-center">
-                        <input
-                            value={name}
-                            onChange={e => {setName(e.target.value)}} 
-                            type="text" 
-                            placeholder="Name" 
-                            className="input input-bordered w-full" 
-                        />
+                <form onSubmit={handleAdd} className="w-full px-2">
+                    <h3 className="font-bold text-lg mt-1 mb-3">Add New Student</h3>
+                    <div className={styles.modalContainer}>
+                        <div className={styles.modalLabels}>Name</div>
+                        <div>
+                            <input value={name} onChange={e => {setName(e.target.value)}}  type="text" className="input input-bordered w-full" />
+                        </div>
+                        <div className={styles.modalLabels}>Subject</div>
+                        <div>
+                            <input value={subject} onChange={e => {setSubject(e.target.value)}} type="text" className="input input-bordered w-full" />
+                        </div>
+                        <div className={styles.modalLabels}>Lesson Duration</div>
+                        <div className="flex items-center">
+                            <label className="input-group">
+                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
+                                <span>hrs</span>
+                            </label>
+                            <label className="input-group">
+                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
+                                <span>mins</span>
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Lesson Rate</div>
+                        <div>
+                            <label className="input-group">
+                                <span>$</span>
+                                <input type="number" className="input input-bordered w-24" value={rate} onChange={e => {setRate(parseInt(e.target.value))}}/>
+                                <span>per hour</span>
+                            </label>
+                        </div>
                     </div>
                     <div className="modal-action">
-                        <input
-                            value={subject} 
-                            onChange={e => {setSubject(e.target.value)}}
-                            type="text" 
-                            placeholder="Subject" 
-                            className="input input-bordered w-full" />
-                    </div>
-                    <div className="modal-action">
-                        <button type="reset" className="btn btn-ghost" onClick={closeModal}>Cancel</button>
-                        <button type="submit" className="btn">Add Student</button>
+                        <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        <button type="submit" className="btn btn-success">Add</button>
                     </div>
                 </form>
             </Modal>
@@ -115,13 +139,19 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [name, setName] = useState(student.name);
     const [subject, setSubject] = useState(student.subject);
+    const [durationHours, setDurationHours] = useState(student.lesson_duration_hours);
+    const [durationMins, setDurationMins] = useState(student.lesson_duration_mins);
+    const [rate, setRate] = useState(student.lesson_rate);
 
     const handleEdit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
         
         const editStudent = {
             name: name,
-            subject: subject
+            subject: subject,
+            lesson_duration_hours: durationHours,
+            lesson_duration_mins: durationMins,
+            lesson_rate: rate
         }
 
         fetch(`/api/students/${student.id}`, {
@@ -139,6 +169,9 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
         setIsModalOpen(true);
         setName(student.name);
         setSubject(student.subject);
+        setDurationHours(student.lesson_duration_hours);
+        setDurationMins(student.lesson_duration_mins);
+        setRate(student.lesson_rate);
     }
 
     return (
@@ -146,27 +179,39 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
             <button className="btn btn-outline btn-success mr-2.5" onClick={openModal}>Edit <HiOutlinePencil size={20}/></button>
             <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleEdit}>
-                    <h3 className="font-bold text-lg">Edit Student</h3>
-                    <div className="modal-action flex justify-center">
-                        <input
-                            value={name}
-                            onChange={e => {setName(e.target.value)}} 
-                            type="text" 
-                            placeholder="Name" 
-                            className="input input-bordered w-full" 
-                        />
+                <h3 className="font-bold text-lg mt-1 mb-3">Edit Student</h3>
+                    <div className={styles.modalContainer}>
+                        <div className={styles.modalLabels}>Name</div>
+                        <div>
+                            <input value={name} onChange={e => {setName(e.target.value)}}  type="text" className="input input-bordered w-full" />
+                        </div>
+                        <div className={styles.modalLabels}>Subject</div>
+                        <div>
+                            <input value={subject} onChange={e => {setSubject(e.target.value)}} type="text" className="input input-bordered w-full" />
+                        </div>
+                        <div className={styles.modalLabels}>Lesson Duration</div>
+                        <div className="flex items-center">
+                            <label className="input-group">
+                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
+                                <span>hrs</span>
+                            </label>
+                            <label className="input-group">
+                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
+                                <span>mins</span>
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Lesson Rate</div>
+                        <div>
+                            <label className="input-group">
+                                <span>$</span>
+                                <input type="number" className="input input-bordered w-24" value={rate} onChange={e => {setRate(parseInt(e.target.value))}}/>
+                                <span>per hour</span>
+                            </label>
+                        </div>
                     </div>
                     <div className="modal-action">
-                        <input
-                            value={subject} 
-                            onChange={e => {setSubject(e.target.value)}}
-                            type="text" 
-                            placeholder="Subject" 
-                            className="input input-bordered w-full" />
-                    </div>
-                    <div className="modal-action">
-                        <button type="reset" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                        <button type="submit" className="btn">Save Changes</button>
+                        <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        <button type="submit" className="btn btn-success">Save Changes</button>
                     </div>
                 </form>
             </Modal>
@@ -183,6 +228,8 @@ function StudentInfo({getStudents, student}: ModifyStudentProps) {
             <div className={styles.studentInfo}>
                 <p><span className="font-bold">Name: </span>{student.name}</p>
                 <p><span className="font-bold">Subject: </span>{student.subject}</p>
+                <p><span className="font-bold">Lesson Duration: </span>{student.lesson_duration_hours} {student.lesson_duration_hours === 1 ? "hr" : "hrs"} {student.lesson_duration_mins} mins</p>
+                <p><span className="font-bold">Lesson Rate: </span>${student.lesson_rate} per hour</p>
             </div>
             <div className={styles.studentInfoActions}>
                 <EditStudent student={student} getStudents={getStudents} />

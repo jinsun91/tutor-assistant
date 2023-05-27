@@ -38,3 +38,17 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.modalContainer {
+    display: grid;
+    grid-template-rows: repeat(3, 60px);
+    grid-template-columns: 1fr 2.5fr;
+    row-gap: 10px;
+    column-gap: 17px;
+    align-items: center;
+}
+
+.modalLabels {
+    text-align: end;
+    font-weight: 600;
+}

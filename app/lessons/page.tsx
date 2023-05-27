@@ -98,10 +98,10 @@ function AddLesson({getLessons}: AddLessonProps) {
 
     return (
         <>
-            <button onClick={openModal} className="btn btn-success">Add Lesson</button>
+            <button onClick={openModal} className="btn btn-success">Add New Lesson</button>
             <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleAdd} className="w-full px-2">
-                    <h3 className="font-bold text-lg mt-1 mb-3">Add Lesson</h3>
+                    <h3 className="font-bold text-lg mt-1 mb-3">Add New Lesson</h3>
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
                         <div>
@@ -124,7 +124,7 @@ function AddLesson({getLessons}: AddLessonProps) {
                                 <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
                                 <span>hrs</span>
                             </label>
-                            <label className="input-group flex-1">
+                            <label className="input-group">
                                 <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
                                 <span>mins</span>
                             </label>
@@ -213,7 +213,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
 
     return (
         <>
-            <div className={styles.lessonInfoContainer} onClick={openModal}>
+            <div className={`${styles.lessonInfoContainer} ${lesson.completed === 0 ? "bg-red-200" : "bg-green-200"}`} onClick={openModal}>
                 <p className={styles.lessonInfo}><b>{lesson.student_name}</b></p>
                 <p className={styles.lessonInfo}>{lesson.date_time.format("hh:mm a")}</p>
             </div>
@@ -243,7 +243,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
                                 <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
                                 <span>hrs</span>
                             </label>
-                            <label className="input-group flex-1">
+                            <label className="input-group">
                                 <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
                                 <span>mins</span>
                             </label>
