@@ -1,27 +1,17 @@
 "use client"
 
-import { useState, useEffect, FormEventHandler } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
 import { ImCheckmark, ImCross } from 'react-icons/im';
 import styles from './home.module.css'
 import { getDayLessons, Lesson } from './lessons/page';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { formatIncome, addCommas } from '../utils/formatting';
 
 interface LessonsTableProps {
   	todayLessons: Lesson[],
 	getLessons: () => Promise<void>
-}
-
-interface LessonInfoProps {
-    lesson: Lesson,
-    getLessons: () => Promise<void>
-}
-
-type Student = {
-    id: number,
-    name: string,
-    subject: string
 }
 
 function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
@@ -67,7 +57,7 @@ function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
 								<td>{lesson.student_name}</td>
 								<td>{lesson.date_time.format("hh:mm A")}</td>
 								<td>{lesson.duration_hours} {lesson.duration_hours === 1 ? "hr" : "hrs"} {lesson.duration_mins} mins</td>
-								<td></td>
+								<td>${formatIncome(lesson.income)}</td>
 								<td className={lesson.completed === 0 ? "bg-red-200" : "bg-green-200"}>
 									<div className="flex justify-between items-center">
 										{lesson.completed === 1 ? "Yes" : "No"}
@@ -80,12 +70,13 @@ function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
 													</div>
 												</div>
 											}
-											{lesson.completed === 1 &&
-											<div className="tooltip" data-tip="Mark as Not Complete"> 
-												<div className="rounded-full shadow p-2 mr-1.5 cursor-pointer" onClick={() => handleMarkAsComplete(lesson)}>
-													<ImCross size={20} className="text-red-500"/>
+											{
+												lesson.completed === 1 &&
+												<div className="tooltip" data-tip="Mark as Not Complete"> 
+													<div className="rounded-full shadow p-2 mr-1.5 cursor-pointer" onClick={() => handleMarkAsComplete(lesson)}>
+														<ImCross size={20} className="text-red-500"/>
+													</div>
 												</div>
-											</div>
 											}
 										</div>
 									</div>
@@ -101,6 +92,7 @@ function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
 
 export default function Home() {
 	const [lessons, setLessons] = useState<Lesson[]>([]);
+	const [todayIncome, setTodayIncome] = useState(0);
 
 	async function getLessons() {
 		fetch("/api/lessons")
@@ -130,12 +122,10 @@ export default function Home() {
 						<LessonsTable todayLessons={todayLessons} getLessons={getLessons} />
 					</div>
 					<div className={styles.todayEarningsSection}>
-						<h2>Today's Earnings</h2>
 						<div className="stats shadow">
 							<div className="stat">
-								<div className="stat-title">Total Page Views</div>
-								<div className="stat-value">89,400</div>
-								<div className="stat-desc">21% more than last month</div>
+								<div className="stat-title">Today's Income</div>
+								<div className="stat-value">{addCommas(todayLessons.reduce((acc, lesson: Lesson) => acc + lesson.completed === 1 ? lesson.income : 0, 0))}</div>
 							</div>
 						</div>
 						<button className="btn btn-success">Add Earnings to Finances</button>

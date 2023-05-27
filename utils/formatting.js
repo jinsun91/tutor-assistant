@@ -27,3 +27,25 @@ export function formatDateTime(hours, mins) {
 
     return formattedStr;
 }
+
+export function calculateLessonIncome(rate, hours, mins) {
+    let total = 0;
+    total += rate * hours;
+    total += rate * (mins / 60);
+
+    if (total % 1 != 0) {
+        total = total.toFixed(2);
+    }
+    
+    return total;
+}
+
+export function formatIncome(number) {
+    const decimalPart = number % 1;
+  
+    if (decimalPart === 0 && decimalPart.toFixed(2).slice(-2) === "00") {
+      return Math.trunc(number);
+    } else {
+      return number;
+    }
+}

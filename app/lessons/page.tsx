@@ -1,7 +1,7 @@
 "use client"
 
 import { getMonth } from '../../utils/date';
-import { useState, Fragment, FormEventHandler, useEffect, ReactNode } from 'react';
+import { useState, Fragment, FormEventHandler, useEffect, ChangeEvent } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from './lessons.module.css';
@@ -9,6 +9,7 @@ import Modal from '../components/Modal';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { calculateLessonIncome, formatIncome } from '../../utils/formatting';
 
 export type Lesson = {
     id: number,
@@ -24,7 +25,10 @@ export type Lesson = {
 type Student = {
     id: number,
     name: string,
-    subject: string
+    subject: string,
+    lesson_duration_hours: number,
+    lesson_duration_mins: number,
+    lesson_rate: number
 }
 
 interface CalendarProps {
@@ -48,8 +52,9 @@ function AddLesson({getLessons}: AddLessonProps) {
     const [dateTime, setDateTime] = useState<Dayjs | null>(dayjs(Date.now()));
     const [durationHours, setDurationHours] = useState(0);
     const [durationMins, setDurationMins] = useState(0);
+    const [income, setIncome] = useState(0);
     const [completed, setCompleted] = useState(0);
-    const [students, setStudents] = useState([]);
+    const [students, setStudents] = useState<Student[]>([]);
 
     async function getStudents() {
         fetch("/api/students")
@@ -67,6 +72,7 @@ function AddLesson({getLessons}: AddLessonProps) {
         setDateTime(dayjs(Date.now()));
         setDurationHours(0);
         setDurationMins(0);
+        setIncome(0);
         setCompleted(0);
     }
 
@@ -78,6 +84,7 @@ function AddLesson({getLessons}: AddLessonProps) {
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
             duration_hours: durationHours,
             duration_mins: durationMins,
+            income: income,
             completed: completed
         }
         
@@ -97,6 +104,18 @@ function AddLesson({getLessons}: AddLessonProps) {
         }
     }
 
+    function handleStudentChange(e: ChangeEvent<HTMLSelectElement>) {
+        const selectedStudentId = parseInt(e.target.value)
+        setStudentId(selectedStudentId);
+        const selectedStudent = students.find((s: Student) => s.id === selectedStudentId);
+        if (selectedStudent !== undefined) {
+            setDurationHours(selectedStudent.lesson_duration_hours);
+            setDurationMins(selectedStudent.lesson_duration_mins);
+            setIncome(calculateLessonIncome(selectedStudent.lesson_rate, selectedStudent.lesson_duration_hours, selectedStudent.lesson_duration_mins));
+        }
+        
+    }
+
     return (
         <>
             <button onClick={openModal} className="btn btn-success">Add New Lesson</button>
@@ -106,7 +125,7 @@ function AddLesson({getLessons}: AddLessonProps) {
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
                         <div>
-                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={handleStudentChange}>
                                 <option value={-1} disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
@@ -128,6 +147,13 @@ function AddLesson({getLessons}: AddLessonProps) {
                             <label className="input-group">
                                 <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
                                 <span>mins</span>
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Income</div>
+                        <div>
+                            <label className="input-group">
+                                <span>$</span>
+                                <input type="number" className="input input-bordered w-28" value={formatIncome(income)} onChange={e => {setIncome(parseFloat(e.target.value))}}/>
                             </label>
                         </div>
                         <div className={styles.modalLabels}>Completed</div>
@@ -154,6 +180,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     const [dateTime, setDateTime] = useState<Dayjs | null>(lesson.date_time);
     const [durationHours, setDurationHours] = useState(lesson.duration_hours);
     const [durationMins, setDurationMins] = useState(lesson.duration_mins);
+    const [income, setIncome] = useState(formatIncome(lesson.income));
     const [completed, setCompleted] = useState(lesson.completed);
     const [students, setStudents] = useState([]);
 
@@ -173,6 +200,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
         setDateTime(lesson.date_time);
         setDurationHours(lesson.duration_hours);
         setDurationMins(lesson.duration_mins);
+        setIncome(formatIncome(lesson.income));
         setCompleted(lesson.completed);
     }
 
@@ -185,7 +213,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
         setIsModalOpen(false);
     }
 
-    const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
+    const handleUpdate: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
         const updatedLesson = {
@@ -193,6 +221,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
             duration_hours: durationHours,
             duration_mins: durationMins,
+            income: income,
             completed: completed
         }
         
@@ -212,6 +241,17 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
         }
     }
 
+    function handleStudentChange(e: ChangeEvent<HTMLSelectElement>) {
+        const selectedStudentId = parseInt(e.target.value)
+        setStudentId(selectedStudentId);
+        const selectedStudent: any = students.find((s: Student) => s.id === selectedStudentId);
+        if (selectedStudent !== undefined) {
+            setDurationHours(selectedStudent.lesson_duration_hours);
+            setDurationMins(selectedStudent.lesson_duration_mins);
+            setIncome(calculateLessonIncome(selectedStudent.lesson_rate, selectedStudent.lesson_duration_hours, selectedStudent.lesson_duration_mins));
+        }
+    }
+
     return (
         <>
             <div className={`${styles.lessonInfoContainer} ${lesson.completed === 0 ? "bg-red-200" : "bg-green-200"}`} onClick={openModal}>
@@ -220,12 +260,12 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
             </div>
             <Modal isModalOpen={isModalOpen}>
                 <label htmlFor="my-modal-3" className="btn btn-sm btn-circle absolute right-4 top-4" onClick={() => setIsModalOpen(false)}>✕</label>
-                <form onSubmit={handleAdd} className="w-full px-2">
+                <form onSubmit={handleUpdate} className="w-full px-2">
                     <h3 className="font-bold text-lg mt-1 mb-3">Lesson Information</h3>
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
                         <div>
-                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={handleStudentChange}>
                                 <option value={-1} disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
@@ -247,6 +287,13 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
                             <label className="input-group">
                                 <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
                                 <span>mins</span>
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Income</div>
+                        <div>
+                            <label className="input-group">
+                                <span>$</span>
+                                <input type="number" className="input input-bordered w-28" value={income} onChange={e => {setIncome(parseFloat(e.target.value))}}/>
                             </label>
                         </div>
                         <div className={styles.modalLabels}>Completed</div>
