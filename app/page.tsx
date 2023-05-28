@@ -1,17 +1,21 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { ImCheckmark, ImCross } from 'react-icons/im';
 import styles from './home.module.css'
 import { getDayLessons, Lesson } from './lessons/page';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { formatIncome, formatDateTime, addCommas } from '../utils/formatting';
+import { formatIncome, formatDateTime } from '../utils/formatting';
 
 interface LessonsTableProps {
   	todayLessons: Lesson[],
 	getLessons: () => Promise<void>,
+}
+
+type IncomeAutoAdd = {
+	date: Dayjs
 }
 
 function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
@@ -93,6 +97,8 @@ function LessonsTable({todayLessons, getLessons}: LessonsTableProps) {
 export default function Home() {
 	const [lessons, setLessons] = useState<Lesson[]>([]);
 	const [todayIncome, setTodayIncome] = useState(0);
+	const [incomeAutoAdds, setIncomeAutoAdds] = useState([]);
+	const [todayIncomeAutoAdded, setTodayIncomeAutoAdded] = useState(false);
 
 	async function getLessons() {
 		fetch("/api/lessons")
@@ -104,14 +110,68 @@ export default function Home() {
 			setLessons(formattedData);
 			const today = dayjs(Date.now());
 			const todayLessons = getDayLessons(formattedData, today);
-			console.log(todayLessons);
 			setTodayIncome(todayLessons.filter(lesson => lesson.completed === 1).reduce((acc, lesson: Lesson) => acc + lesson.income, 0));
+		});
+	}
+
+	async function getIncomeAutoAdds() {
+		fetch("/api/income-auto-adds")
+		.then(response => response.json())
+		.then(data => {
+			const formattedData = data.map((incomeAutoAdd: IncomeAutoAdd) => {
+				return {date: dayjs(incomeAutoAdd.date)}
+			});
+			setIncomeAutoAdds(formattedData);
+
+			const autoAddDates = formattedData.map((value: IncomeAutoAdd) => value.date.format("YYYY-MM-DD"));
+
+			setTodayIncomeAutoAdded(autoAddDates.includes(dayjs(Date.now()).format("YYYY-MM-DD")));
 		});
 	}
 
 	useEffect(() => {
 		getLessons();
+		getIncomeAutoAdds();
 	}, []);
+
+	function handleIncomeAutoAdd(todayLessons: Lesson[]) {
+		if (!todayIncomeAutoAdded) {
+			const completedLessons = todayLessons.filter((lesson: Lesson) => lesson.completed === 1);
+
+			for (let i = 0; i < completedLessons.length; i++) {
+				const curr = completedLessons[i];
+
+				const income = {
+					date: curr.date_time.format("YYYY-MM-DD"),
+					student_id: curr.student_id,
+					amount: curr.income,
+					received: 0
+				}
+
+				fetch("/api/finances", {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify(income)
+				});
+			}
+
+			fetch("/api/income-auto-adds", {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({date: dayjs(Date.now()).format("YYYY-MM-DD")})
+			}).then(data => {
+				getIncomeAutoAdds();
+			});
+		}
+	}
+
+	function handleResetAutoAdd() {
+		fetch(`/api/income-auto-adds/${dayjs(Date.now()).format("YYYY-MM-DD")}`, {
+            method: "DELETE",
+        }).then(() => {
+            getIncomeAutoAdds();
+        });
+	}
 
 	const today = dayjs(Date.now());
 	const todayLessons = getDayLessons(lessons, today);
@@ -126,13 +186,25 @@ export default function Home() {
 						<LessonsTable todayLessons={todayLessons} getLessons={getLessons} />
 					</div>
 					<div className={styles.todayEarningsSection}>
-						<div className="stats shadow mb-5">
-							<div className="stat">
-								<div className="stat-title">Today's Income</div>
-								<div className="stat-value">${formatIncome(todayIncome)}</div>
+						<div className={styles.todayEarningsContainer}>
+							<div className="stats shadow mb-5 w-64">
+								<div className="stat">
+									<div className="stat-title">Today's Income</div>
+									<div className="stat-value">${formatIncome(todayIncome)}</div>
+								</div>
+							</div>
+							<div className="w-40">
+								{
+									todayIncomeAutoAdded ?
+									<div className="tooltip" data-tip="Income has already been added to Finances">
+										<button className={`btn btn-success ${styles.disabledButton}`} onClick={() => handleIncomeAutoAdd(todayLessons)}>Auto Add<br/> to Finances</button>
+									</div>
+									:
+									<button className="btn btn-success" onClick={() => handleIncomeAutoAdd(todayLessons)}>Auto Add<br/> to Finances</button>
+								}
+								<button className="btn btn-ghost btn-sm mt-2" onClick={handleResetAutoAdd}>Reset Auto Add</button>
 							</div>
 						</div>
-						<button className="btn btn-success">Add Today's Income<br/> to Finances</button>
 					</div>
 				</div>
 			</main>

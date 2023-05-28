@@ -4,4 +4,16 @@
 
 .todayEarningsSection {
     width: 30%;
+    padding: 20px;
+}
+
+.todayEarningsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.disabledButton {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
