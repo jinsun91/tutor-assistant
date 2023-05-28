@@ -2,7 +2,6 @@
 
 import styles from './finances.module.css';
 import Modal from '../components/Modal';
-import { addCommas } from '../../utils/formatting';
 import { HiOutlinePencil } from 'react-icons/hi';
 import { ImCheckmark, ImCross } from 'react-icons/im';
 import { BsTrash3Fill } from 'react-icons/bs';
@@ -12,6 +11,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { formatIncome } from '../../utils/formatting';
+import { FaFileInvoiceDollar } from 'react-icons/fa';
 
 type Student = {
     id: number,
@@ -35,6 +35,12 @@ interface EditIncomeProps {
 }
 
 interface DeleteIncomeProps {
+    getFinances: () => Promise<void>,
+    selectedEntries: IncomeEntry[],
+    setAllRowsSelected: (val: boolean) => void,
+}
+
+interface InvoiceProps {
     getFinances: () => Promise<void>,
     selectedEntries: IncomeEntry[],
     setAllRowsSelected: (val: boolean) => void,
@@ -173,8 +179,8 @@ function DeleteIncome({getFinances, selectedEntries, setAllRowsSelected}: Delete
     return (
         <>
             <div className="tooltip" data-tip="Delete Income">
-                <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer">
-                    <BsTrash3Fill cursor="pointer" size={23} className="text-gray-500" onClick={() => setIsModalOpen(true)}/>
+                <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer" onClick={() => setIsModalOpen(true)}>
+                    <BsTrash3Fill cursor="pointer" size={23} className="text-gray-500" />
                 </div>
             </div>
             <Modal isModalOpen={isModalOpen}>
@@ -317,6 +323,56 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
                         <button type="submit" className="btn">Save Changes</button>
                     </div>
                 </form>
+            </Modal>
+        </>
+    )
+}
+
+function Invoice({getFinances, selectedEntries, setAllRowsSelected}: InvoiceProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [invoice, setInvoice] = useState("");
+
+    function writeInvoice() {
+        console.log("HEREEEE")
+        console.log(selectedEntries);
+        let invoiceStr = "";
+        for (let i = 0; i < selectedEntries.length; i++) {
+            invoiceStr += dayjs(selectedEntries[i].date).format("MMM DD") + " - $" + formatIncome(selectedEntries[i].amount) + "\n";
+        }
+        invoiceStr += "Total: $" + formatIncome(selectedEntries.reduce((acc, income: IncomeEntry) => acc + income.amount, 0));
+        return invoiceStr;
+    }
+
+    function openModal() {
+        setIsModalOpen(true);
+        setInvoice(writeInvoice());
+    }
+
+    useEffect(() => {
+        setInvoice(writeInvoice());
+    }, []);
+
+    function handleCopy() {
+        navigator.clipboard.writeText(invoice);
+    }
+
+    return (
+        <>
+            <div className="tooltip" data-tip={"Create Invoice"}>
+                <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer" onClick={openModal}>
+                    <FaFileInvoiceDollar size={23} className="text-yellow-500" />
+                </div>
+            </div>
+            <Modal isModalOpen={isModalOpen}>
+                <div className="w-full">
+                    <div className={styles.displayLineBreak}>
+                        {invoice}
+                    </div>
+                    <div>
+                        <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Close</button>
+                        <button className="btn" onClick={handleCopy}>Copy</button>
+                    </div>
+                </div>            
             </Modal>
         </>
     )
@@ -467,9 +523,10 @@ export default function Finances() {
                     <div className={styles.financeActionsOuterContainer}>
                         <AddIncome getFinances={getFinances} />
                         <div className={styles.financeActionsContainer}>
+                            <Invoice getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected} />
+                            <DeleteIncome getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                             <MarkReceived isReceived={1} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                             <MarkReceived isReceived={0} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
-                            <DeleteIncome getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                         </div>
                     </div>
                 </div>
