@@ -44,11 +44,11 @@ export function formatIncome(number) {
     const decimalPart = number % 1;
   
     if (decimalPart === 0 && decimalPart.toFixed(2).slice(-2) === "00") {
-        return Math.trunc(number);
+        return addCommas(Math.trunc(number));
     } else if (countDecimals(number) === 1) {
-        return number.toFixed(2);
+        return addCommas(number.toFixed(2));
     }
-    return number;
+    return addCommas(number);
 }
 
 function countDecimals(number) {

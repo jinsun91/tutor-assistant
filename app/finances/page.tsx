@@ -7,6 +7,11 @@ import { HiOutlinePencil } from 'react-icons/hi';
 import { ImCheckmark, ImCross } from 'react-icons/im';
 import { BsTrash3Fill } from 'react-icons/bs';
 import { useState, useEffect, FormEventHandler, ChangeEvent } from 'react';
+import { DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { formatIncome } from '../../utils/formatting';
 
 type Student = {
     id: number,
@@ -16,7 +21,7 @@ type Student = {
 
 type IncomeEntry = {
     id: number,
-    date: string,
+    date: Dayjs,
     student_name: string,
     student_id: number,
     amount: number,
@@ -48,7 +53,7 @@ interface AddIncomeProps {
 
 function AddIncome({ getFinances }: AddIncomeProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [date, setDate] = useState("");
+    const [date, setDate] = useState(dayjs(Date.now()));
     const [studentId, setStudentId] = useState(-1);
     const [amount, setAmount] = useState(0);
     const [received, setReceived] = useState(0);
@@ -66,7 +71,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
 
     function openModal() {
         setIsModalOpen(true);
-        setDate("");
+        setDate(dayjs(Date.now()));
         setStudentId(-1);
         setAmount(0);
         setReceived(0);
@@ -78,7 +83,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
         e.preventDefault();
 
         const income = {
-            date: date,
+            date: date?.format("YYYY-MM-DD"),
             student_id: studentId,
             amount: amount,
             received: received
@@ -95,45 +100,48 @@ function AddIncome({ getFinances }: AddIncomeProps) {
         setIsModalOpen(false);
     }
 
+    function handleDateChange(newValue: Dayjs | null) {
+        if (newValue !== null) {
+            setDate(newValue);
+        }
+    }
+
     return (
         <>
-            <button className="btn btn-sm btn-outline btn-info" onClick={openModal}>Add Income</button>
+            <button className="btn btn-sm btn-outline btn-info" onClick={openModal}>Add New Income</button>
             <Modal isModalOpen={isModalOpen}>
-                <form onSubmit={handleAdd} className="w-full">
+                <form onSubmit={handleAdd} className="w-full px-2">
                     <h3 className="font-bold text-lg">Add New Income</h3>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Student</span>
-                        </label>
-                        <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
-                            <option value={-1} disabled>Choose Student</option>
-                            {
-                                students.map((student: Student) => {
-                                    return <option key={student.id} value={student.id}>{student.name}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Date</span>
-                        </label>
-                        <input type="text" value={date} placeholder="YYYY-MM-DD" onChange={e => {setDate(e.target.value)}}  className="input input-md input-bordered w-full max-w-xs" />
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Amount (KRW)</span>
-                        </label>
-                        <input type="number" value={amount} placeholder="Enter Amount" onChange={e => {setAmount(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Received</span>
-                        </label>
-                        <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
-                            <option key={0} value={0}>No</option>
-                            <option key={1} value={1}>Yes</option>
-                        </select>
+                    <div className={styles.modalContainer}>
+                        <div className={styles.modalLabels}>Student</div>
+                        <div>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                                <option value={-1} disabled>Choose Student</option>
+                                {
+                                    students.map((student: Student) => {
+                                        return <option key={student.id} value={student.id}>{student.name}</option>
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <div className={styles.modalLabels}>Date</div>
+                        <div>
+                            <DatePicker className="w-full" value={date} onChange={handleDateChange}/>
+                        </div>
+                        <div className={styles.modalLabels}>Amount</div>
+                        <div>
+                            <label className="input-group">
+                                <span>$</span>
+                                <input type="number" value={amount} placeholder="Enter Amount" onChange={e => {setAmount(parseFloat(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Received</div>
+                        <div>
+                            <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                                <option key={0} value={0}>No</option>
+                                <option key={1} value={1}>Yes</option>
+                            </select>
+                        </div>
                     </div>
                     <div className="modal-action">
                         <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
@@ -159,6 +167,7 @@ function DeleteIncome({getFinances, selectedEntries, setAllRowsSelected}: Delete
             getFinances();
         });
         setIsModalOpen(false);
+        setAllRowsSelected(false);
     }
 
     return (
@@ -242,7 +251,7 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
         e.preventDefault();
 
         const editIncome = {
-            date: date,
+            date: date?.format("YYYY-MM-DD"),
             student_id: studentId,
             amount: amount,
             received: received
@@ -260,45 +269,48 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
         setIsModalOpen(false);
     }
 
+    function handleDateChange(newValue: Dayjs | null) {
+        if (newValue !== null) {
+            setDate(newValue);
+        }
+    }
+
     return (
         <>
             <HiOutlinePencil cursor="pointer" size={20} className="text-blue-500" onClick={openModal}/>
             <Modal isModalOpen={isModalOpen}>
-                <form onSubmit={handleAdd} className="w-full">
+                <form onSubmit={handleAdd} className="w-full px-2">
                     <h3 className="font-bold text-lg">Edit Income</h3>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Student</span>
-                        </label>
-                        <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
-                            <option value={-1} disabled>Choose Student</option>
-                            {
-                                students.map((student: Student) => {
-                                    return <option key={student.id} value={student.id}>{student.name}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Date</span>
-                        </label>
-                        <input type="text" value={date} placeholder="YYYY-MM-DD" onChange={e => {setDate(e.target.value)}}  className="input input-md input-bordered w-full max-w-xs" />
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Amount (KRW)</span>
-                        </label>
-                        <input type="number" value={amount} placeholder="Enter Amount" onChange={e => {setAmount(parseInt(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
-                    </div>
-                    <div className="modal-action w-full">
-                        <label className="label">
-                            <span className="label-text">Received</span>
-                        </label>
-                        <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
-                            <option key={0} value={0}>No</option>
-                            <option key={1} value={1}>Yes</option>
-                        </select>
+                    <div className={styles.modalContainer}>
+                        <div className={styles.modalLabels}>Student</div>
+                        <div>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                                <option value={-1} disabled>Choose Student</option>
+                                {
+                                    students.map((student: Student) => {
+                                        return <option key={student.id} value={student.id}>{student.name}</option>
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <div className={styles.modalLabels}>Date</div>
+                        <div>
+                            <DatePicker className="w-full" value={date} onChange={handleDateChange}/>
+                        </div>
+                        <div className={styles.modalLabels}>Amount</div>
+                        <div>
+                            <label className="input-group">
+                                <span>$</span>
+                                <input type="number" value={amount} placeholder="Enter Amount" onChange={e => {setAmount(parseFloat(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
+                            </label>
+                        </div>
+                        <div className={styles.modalLabels}>Received</div>
+                        <div>
+                            <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                                <option key={0} value={0}>No</option>
+                                <option key={1} value={1}>Yes</option>
+                            </select>
+                        </div>
                     </div>
                     <div className="modal-action">
                         <button type="reset" className="btn btn-ghost" onClick={() => {setIsModalOpen(false)}}>Cancel</button>
@@ -329,8 +341,8 @@ export default function Finances() {
         fetch("/api/finances")
         .then(response => response.json())
         .then(data => {
-            const rows = data.map((value: IncomeEntry) => {
-                return {...value, isSelected: false}
+            const rows = data.map((income: IncomeEntry) => {
+                return {...income, date: dayjs(income.date), isSelected: false}
             });
             setFinances(rows);
             setFilteredFinances(filterEntries(year, month, studentId, rows));
@@ -347,8 +359,14 @@ export default function Finances() {
     const selectedRows = filteredFinances.filter((entry: IncomeEntry) => entry.isSelected);
     console.log(selectedRows);
 
-    function getUniqueDates(substringStart: number, substringEnd: number) {
-        const getDates = finances.map((income: IncomeEntry) => income.date.substring(substringStart, substringEnd));
+    function getUniqueYears() {
+        const getDates = finances.map((income: IncomeEntry) => income.date.format("YYYY"));
+        const getUniqueDates = new Set(getDates);
+        return Array.from(getUniqueDates);
+    }
+
+    function getUniqueMonths() {
+        const getDates = finances.map((income: IncomeEntry) => income.date.format("MMM"));
         const getUniqueDates = new Set(getDates);
         return Array.from(getUniqueDates);
     }
@@ -375,13 +393,13 @@ export default function Finances() {
         console.log(filterEntries);
         if (year != 0) {
             console.log("Enter year");
-            filteredEntries = filteredEntries.filter((entry) => parseInt(entry.date.substring(0, 4)) === year);
+            filteredEntries = filteredEntries.filter((entry) => parseInt(entry.date.format("YYYY")) === year);
         }
 
         if (month !== "0") {
             console.log("Enter month");
             console.log(month);
-            filteredEntries = filteredEntries.filter((entry) => entry.date.substring(5, 7) === month);
+            filteredEntries = filteredEntries.filter((entry) => entry.date.format("MMM") === month);
         }
 
         if (studentId != -1) {
@@ -405,93 +423,95 @@ export default function Finances() {
     }
 
     return (
-        <div className={styles.container}>
-            <div className={styles.topBar}>
-                <div className="stats shadow mr-5 mb-5">
-                    <div className="stat">
-                        <div className="stat-title">Total</div>
-                        <div className="stat-value mt-2">{addCommas(filteredFinances.reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW</div>
-                        <div className="mt-3">
-                            <div className="stat-desc text-green-500 mr-8">{addCommas(filteredFinances.filter((income: IncomeEntry) => income.received === 1).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW received</div>
-                            <div className="stat-desc text-red-500">{addCommas(filteredFinances.filter((income: IncomeEntry) => income.received === 0).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} KRW not received</div>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <div className={styles.container}>
+                <div className={styles.topBar}>
+                    <div className="stats shadow mr-5 mb-5 w-72">
+                        <div className="stat">
+                            <div className="stat-title">Total</div>
+                            <div className="stat-value mt-2">${formatIncome(filteredFinances.reduce((acc, income: IncomeEntry) => acc + income.amount, 0))}</div>
+                            <div className="mt-3">
+                                <div className="stat-desc text-green-500 mr-8">${formatIncome(filteredFinances.filter((income: IncomeEntry) => income.received === 1).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} received</div>
+                                <div className="stat-desc text-red-500">${formatIncome(filteredFinances.filter((income: IncomeEntry) => income.received === 0).reduce((acc, income: IncomeEntry) => acc + income.amount, 0))} not received</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`${styles.filterActions} shadow -ml-5`}>
+                        <select className="select select-sm select-bordered max-w-xs mr-5" value={year} onChange={(e) => setYear(parseInt(e.target.value))}>
+                            <option value={0}>All Years</option>
+                            { 
+                                getUniqueYears().map((year) => {
+                                    return <option key={year} value={year}>{year}</option>
+                                })
+                            }
+                        </select>
+                        <select className="select select-sm select-bordered max-w-xs mr-5" value={month} onChange={(e) => setMonth(e.target.value)}>
+                            <option value={"0"}>All Months</option>
+                            {    
+                                getUniqueMonths().map((month) => {
+                                    return <option key={month} value={month}>{month}</option>
+                                })
+                            }
+                        </select>
+                        <select className="select select-sm select-bordered max-w-xs mr-5" value={studentId} onChange={(e) => setStudentId(parseInt(e.target.value))}>
+                            <option value={-1}>All Students</option>
+                            { 
+                                students.map((student: Student) => {
+                                    return <option key={student.id} value={student.id}>{student.name}</option>
+                                })
+                            }
+                        </select>
+                        <button className="btn btn-sm" onClick={handleFilterEntries}>Filter</button>
+                        <button className="btn btn-sm ml-2" onClick={showAllEntries}>Show All</button>
+                    </div>
+                    <div className={styles.financeActionsOuterContainer}>
+                        <AddIncome getFinances={getFinances} />
+                        <div className={styles.financeActionsContainer}>
+                            <MarkReceived isReceived={1} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
+                            <MarkReceived isReceived={0} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
+                            <DeleteIncome getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                         </div>
                     </div>
                 </div>
-                <div className={`${styles.filterActions} shadow`}>
-                    <select className="select select-sm select-bordered max-w-xs mr-5" value={year} onChange={(e) => setYear(parseInt(e.target.value))}>
-                        <option value={0}>All Years</option>
-                        { 
-                            getUniqueDates(0, 4).map((year) => {
-                                return <option key={year} value={year}>{year}</option>
-                            })
-                        }
-                    </select>
-                    <select className="select select-sm select-bordered max-w-xs mr-5" value={month} onChange={(e) => setMonth(e.target.value)}>
-                        <option value={"0"}>All Months</option>
-                        {    
-                            getUniqueDates(5, 7).map((month) => {
-                                return <option key={month} value={month}>{month}</option>
-                            })
-                        }
-                    </select>
-                    <select className="select select-sm select-bordered max-w-xs mr-5" value={studentId} onChange={(e) => setStudentId(parseInt(e.target.value))}>
-                        <option value={-1}>All Students</option>
-                        { 
-                            students.map((student: Student) => {
-                                return <option key={student.id} value={student.id}>{student.name}</option>
-                            })
-                        }
-                    </select>
-                    <button className="btn btn-sm" onClick={handleFilterEntries}>Filter</button>
-                    <button className="btn btn-sm ml-2" onClick={showAllEntries}>Show All</button>
-                </div>
-                <div className={styles.financeActionsOuterContainer}>
-                    <AddIncome getFinances={getFinances} />
-                    <div className={styles.financeActionsContainer}>
-                        <MarkReceived isReceived={1} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
-                        <MarkReceived isReceived={0} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
-                        <DeleteIncome getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
-                    </div>
+                <div className="overflow-x-auto">
+                    <table className="table table-compact w-full">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" checked={allRowsSelected} className="checkbox checkbox-sm" onChange={selectAllRows} />
+                                    </label>
+                                </th>
+                                <th>Date</th> 
+                                <th>Student</th> 
+                                <th>Amount</th>
+                                <th>Received</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead> 
+                        <tbody>
+                            {
+                                filteredFinances.map((value: IncomeEntry, index) => {
+                                    return (
+                                        <tr key={index}>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox" checked={value.isSelected} className="checkbox checkbox-sm" onChange={(e) => handleIncomeSelectChange(e, index, value)}/>
+                                                </label>
+                                            </td>
+                                            <td>{value.date.format("MMM DD, YYYY")}</td>
+                                            <td>{value.student_name}</td>
+                                            <td>${formatIncome(value.amount)}</td>
+                                            <td className={value.received === 0 ? "bg-red-200" : "bg-green-200"}>{value.received === 0 ? "No" : "Yes"}</td>
+                                            <td><EditIncome getFinances={getFinances} incomeEntry={value} /></td>
+                                        </tr>
+                                    )
+                                })
+                            }
+                        </tbody> 
+                    </table>
                 </div>
             </div>
-            <div className="overflow-x-auto">
-                <table className="table table-compact w-full">
-                    <thead>
-                        <tr>
-                            <th>
-                                <label>
-                                    <input type="checkbox" checked={allRowsSelected} className="checkbox checkbox-sm" onChange={selectAllRows} />
-                                </label>
-                            </th>
-                            <th>Date</th> 
-                            <th>Student</th> 
-                            <th>Amount (KRW)</th> 
-                            <th>Received</th>
-                            <th>Edit</th>
-                        </tr>
-                    </thead> 
-                    <tbody>
-                        {
-                            filteredFinances.map((value: IncomeEntry, index) => {
-                                return (
-                                    <tr key={index}>
-                                        <td>
-                                            <label>
-                                                <input type="checkbox" checked={value.isSelected} className="checkbox checkbox-sm" onChange={(e) => handleIncomeSelectChange(e, index, value)}/>
-                                            </label>
-                                        </td>
-                                        <td>{value.date.split("T")[0]}</td>
-                                        <td>{value.student_name}</td>
-                                        <td>{addCommas(value.amount)}</td>
-                                        <td className={value.received === 0 ? "bg-red-200" : "bg-green-200"}>{value.received === 0 ? "No" : "Yes"}</td>
-                                        <td><EditIncome getFinances={getFinances} incomeEntry={value} /></td>
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody> 
-                </table>
-            </div>
-        </div>
+        </LocalizationProvider>
     )
 }

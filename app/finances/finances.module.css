@@ -30,3 +30,18 @@
     height:100%;
     margin-bottom: -45px;
 }
+
+.modalContainer {
+    display: grid;
+    grid-template-rows: repeat(4, 60px);
+    grid-template-columns: 1fr 2.8fr;
+    row-gap: 10px;
+    column-gap: 17px;
+    align-items: center;
+    padding-top: 17px;
+}
+
+.modalLabels {
+    text-align: end;
+    font-weight: 600;
+}
