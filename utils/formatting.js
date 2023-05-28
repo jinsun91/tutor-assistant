@@ -45,6 +45,15 @@ export function formatIncome(number) {
   
     if (decimalPart === 0 && decimalPart.toFixed(2).slice(-2) === "00") {
         return Math.trunc(number);
+    } else if (countDecimals(number) === 1) {
+        return number.toFixed(2);
     }
     return number;
+}
+
+function countDecimals(number) {
+    if(Math.floor(number.valueOf()) === number.valueOf()) {
+        return 0
+    }
+    return number.toString().split(".")[1].length || 0; 
 }

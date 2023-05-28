@@ -126,13 +126,13 @@ export default function Home() {
 						<LessonsTable todayLessons={todayLessons} getLessons={getLessons} />
 					</div>
 					<div className={styles.todayEarningsSection}>
-						<div className="stats shadow">
+						<div className="stats shadow mb-5">
 							<div className="stat">
 								<div className="stat-title">Today's Income</div>
-								<div className="stat-value">${todayIncome}</div>
+								<div className="stat-value">${formatIncome(todayIncome)}</div>
 							</div>
 						</div>
-						<button className="btn btn-success">Add Earnings to Finances</button>
+						<button className="btn btn-success">Add Today's Income<br/> to Finances</button>
 					</div>
 				</div>
 			</main>
