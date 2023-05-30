@@ -324,39 +324,51 @@ export function getDayLessons(lessons: Lesson[], day: Dayjs) {
 function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
     function getCurrentDayClass(day: Dayjs) {
         return day.format("DD-MM-YY") === dayjs().format("DD-MM-YY") ?
-            "bg-blue-600 text-white rounded-full w-7" : "";
+            "bg-blue-600 text-white rounded-full w-6 h-6" : "";
     }
 
-    return (
-        <div className="flex-1 grid grid-cols-7 grid-rows-6">
-            {
-                getMonth(monthIndex).map((row, rowIndex) => 
-                    (
-                        <Fragment key={rowIndex}> 
-                            {
-                                row.map((day, colIndex) => {
-                                    return (
-                                        <div className="border border-gray-200 flex flex-col" key={colIndex}>
-                                            <header className="flex flex-col items-left">
-                                                {rowIndex === 0 && (<p className="text-sm mt-1">{day.format('ddd').toUpperCase()}</p>)}
-                                                <p className={`text-sm p-1 my-1 text-left ${getCurrentDayClass(day)}`}>
-                                                    {day.format('DD')}
-                                                </p>
-                                            </header>
-                                            <div>
-                                                { getDayLessons(lessons, day).map(lesson => {
-                                                    return <LessonInfo getLessons={getLessons} lesson={lesson} key={lesson.id}/>
-                                                })}
+    return ( 
+        <>
+            <div className="grid grid-cols-7 grid-rows-1 text-center ">
+                <p className="text-sm mt-1">SUN</p>
+                <p className="text-sm mt-1">MON</p>
+                <p className="text-sm mt-1">TUE</p>
+                <p className="text-sm mt-1">WED</p>
+                <p className="text-sm mt-1">THU</p>
+                <p className="text-sm mt-1">FRI</p>
+                <p className="text-sm mt-1">SAT</p>
+            </div>
+            <div className="flex-1 grid grid-cols-7 grid-rows-6">
+                {
+                    getMonth(monthIndex).map((row, rowIndex) => 
+                        (
+                            <Fragment key={rowIndex}> 
+                                {
+                                    row.map((day, colIndex) => {
+                                        return (
+                                            <div className="border border-gray-200 flex flex-col" key={colIndex}>
+                                                <header className="flex flex-col items-left">
+                                                    <div className={`${getCurrentDayClass(day)} ${styles.dateCircle}`}>
+                                                        <p className={`${styles.date} text-sm inline-block text-left`}>
+                                                            {day.date() === 1 ? day.format('MMM D') : day.format('D')}
+                                                        </p>
+                                                    </div>
+                                                </header>
+                                                <div>
+                                                    { getDayLessons(lessons, day).map(lesson => {
+                                                        return <LessonInfo getLessons={getLessons} lesson={lesson} key={lesson.id}/>
+                                                    })}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )
-                                })
-                            }
-                        </Fragment>
+                                        )
+                                    })
+                                }
+                            </Fragment>
+                        )
                     )
-                )
-            }
-        </div>
+                }
+            </div>
+        </>
     )
 }
 
