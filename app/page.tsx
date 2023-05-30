@@ -179,17 +179,19 @@ export default function Home() {
 	return (
 		<LocalizationProvider dateAdapter={AdapterDayjs}>
 			<main className="text-center">
-				<h2>{today.format("MMMM DD, YYYY")}</h2>
+				<header className="mb-8">
+					<h2 className={styles.dateHeader}>{today.format("dddd, MMMM DD YYYY")}</h2>
+				</header>
 				<div className="flex w-full">
 					<div className={styles.todayLessonsSection}>
-						<h2>Today's Lessons</h2>
+						<h2 className={styles.todayLessonsHeader}>Today's Lessons</h2>
 						<LessonsTable todayLessons={todayLessons} getLessons={getLessons} />
 					</div>
 					<div className={styles.todayEarningsSection}>
 						<div className={styles.todayEarningsContainer}>
 							<div className="stats shadow mb-5 w-64">
 								<div className="stat">
-									<div className="stat-title">Today's Income</div>
+									<div className="stat-title font-bold">Today's Income</div>
 									<div className="stat-value">${formatIncome(todayIncome)}</div>
 								</div>
 							</div>

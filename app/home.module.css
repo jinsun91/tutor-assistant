@@ -17,3 +17,13 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.dateHeader {
+    font-size: 1.5em;
+}
+
+.todayLessonsHeader {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
