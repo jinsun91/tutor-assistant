@@ -432,6 +432,10 @@ export default function Finances() {
         const newFinances: IncomeEntry[] = [...filteredFinances];
         newFinances[index] = {...value, isSelected: e.target.checked};
         setFilteredFinances(newFinances);
+
+        if (e.target.checked === false && allRowsSelected === true) {
+            setAllRowsSelected(false);
+        }
     }
 
     function selectAllRows(e: ChangeEvent<HTMLInputElement>) {

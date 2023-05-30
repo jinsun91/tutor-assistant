@@ -19,8 +19,8 @@ export default function RootLayout({
               <Link href="/"><h1 className="main-logo">Tutor Assistant</h1></Link>
               <nav>
                 <Link href="/lessons" className="nav-item">Lessons</Link>
-                <Link href="/students" className="nav-item">Students</Link>
                 <Link href="/finances" className="nav-item">Finances</Link>
+                <Link href="/students" className="nav-item">Students</Link>
               </nav>
             </div>
           </header>
