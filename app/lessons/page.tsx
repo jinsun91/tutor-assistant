@@ -52,7 +52,7 @@ function AddLesson({getLessons}: AddLessonProps) {
     const [dateTime, setDateTime] = useState<Dayjs | null>(dayjs(Date.now()));
     const [durationHours, setDurationHours] = useState(0);
     const [durationMins, setDurationMins] = useState(0);
-    const [income, setIncome] = useState(0);
+    const [income, setIncome] = useState<number | null>(0);
     const [completed, setCompleted] = useState(0);
     const [students, setStudents] = useState<Student[]>([]);
 
@@ -125,7 +125,7 @@ function AddLesson({getLessons}: AddLessonProps) {
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
                         <div>
-                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={handleStudentChange}>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={handleStudentChange} required>
                                 <option value={-1} disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
@@ -141,11 +141,11 @@ function AddLesson({getLessons}: AddLessonProps) {
                         <div className={styles.modalLabels}>Duration</div>
                         <div className="flex items-center">
                             <label className="input-group">
-                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}} required/>
                                 <span>hrs</span>
                             </label>
                             <label className="input-group">
-                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}} required/>
                                 <span>mins</span>
                             </label>
                         </div>
@@ -153,7 +153,7 @@ function AddLesson({getLessons}: AddLessonProps) {
                         <div>
                             <label className="input-group">
                                 <span>$</span>
-                                <input type="number" className="input input-bordered w-28" value={formatIncome(income)} onChange={e => {setIncome(parseFloat(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-28" value={formatIncome(income)} onChange={e => {setIncome(parseFloat(e.target.value))}} required/>
                             </label>
                         </div>
                         <div className={styles.modalLabels}>Completed</div>

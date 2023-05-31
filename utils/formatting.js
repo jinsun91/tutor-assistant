@@ -41,19 +41,24 @@ export function calculateLessonIncome(rate, hours, mins) {
 }
 
 export function formatIncome(number) {
-    const decimalPart = number % 1;
+    console.log(number);
+    if (!isNaN(number)) {
+        const decimalPart = number % 1;
   
-    if (decimalPart === 0 && decimalPart.toFixed(2).slice(-2) === "00") {
-        return addCommas(Math.trunc(number));
-    } else if (countDecimals(number) === 1) {
-        return addCommas(number.toFixed(2));
+        if (decimalPart === 0 && decimalPart.toFixed(2).slice(-2) === "00") {
+            return addCommas(Math.trunc(number));
+        } else if (countDecimals(number) === 1) {
+            return addCommas(number.toFixed(2));
+        }
+        return addCommas(number);
     }
-    return addCommas(number);
 }
 
 function countDecimals(number) {
-    if(Math.floor(number.valueOf()) === number.valueOf()) {
-        return 0
+    if (!isNaN(number)) {
+        if(Math.floor(number.valueOf()) === number.valueOf()) {
+            return 0
+        }
+        return number.toString().split(".")[1].length || 0; 
     }
-    return number.toString().split(".")[1].length || 0; 
 }
