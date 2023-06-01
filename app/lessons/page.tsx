@@ -189,6 +189,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     const [income, setIncome] = useState(formatIncome(lesson.income));
     const [completed, setCompleted] = useState(lesson.completed);
     const [students, setStudents] = useState([]);
+    const [dateTimeError, setDateTimeError] = useState(false);
 
     async function getStudents() {
         fetch("/api/students")
@@ -222,6 +223,10 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     const handleUpdate: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
+        if (dateTimeError) {
+            return;
+        }
+
         const updatedLesson = {
             student_id: studentId,
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
@@ -242,8 +247,11 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     }
 
     function handleDateTimeChange(newValue: Dayjs | null) {
-        if (newValue !== null) {
+        if (!newValue?.isValid()) {
+            setDateTimeError(true);
+        } else if (newValue !== null) {
             setDateTime(newValue);
+            setDateTimeError(false);
         }
     }
 

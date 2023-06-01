@@ -241,6 +241,7 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
     const [amount, setAmount] = useState(incomeEntry.amount);
     const [received, setReceived] = useState(incomeEntry.received);
     const [students, setStudents] = useState([]);
+    const [dateError, setDateError] = useState(false);
 
     async function getStudents() {
         fetch("/api/students")
@@ -260,8 +261,12 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
         setReceived(incomeEntry.received);
     }
 
-    const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
+    const handleUpdate: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
+
+        if (dateError) {
+            return;
+        }
 
         const editIncome = {
             date: date?.format("YYYY-MM-DD"),
@@ -283,8 +288,11 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
     }
 
     function handleDateChange(newValue: Dayjs | null) {
-        if (newValue !== null) {
+        if (!newValue?.isValid()) {
+            setDateError(true);
+        } else if (newValue !== null) {
             setDate(newValue);
+            setDateError(false);
         }
     }
 
@@ -292,7 +300,7 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
         <>
             <HiOutlinePencil cursor="pointer" size={20} className="text-blue-500" onClick={openModal}/>
             <Modal isModalOpen={isModalOpen}>
-                <form onSubmit={handleAdd} className="w-full px-2">
+                <form onSubmit={handleUpdate} className="w-full px-2">
                     <h3 className="font-bold text-lg">Edit Income</h3>
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
