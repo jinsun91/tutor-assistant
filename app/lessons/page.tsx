@@ -332,7 +332,7 @@ function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
 
     return ( 
         <>
-            <div className="grid grid-cols-7 grid-rows-1 text-center ">
+            <div className={styles.dayOfWeekLabelContainer}>
                 <p className="text-sm mt-1">SUN</p>
                 <p className="text-sm mt-1">MON</p>
                 <p className="text-sm mt-1">TUE</p>

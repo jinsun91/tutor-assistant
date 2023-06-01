@@ -10,6 +10,10 @@
     }
 }
 
+html {
+    overflow-y: scroll;
+}
+
 .menu {
     @apply overflow-y-auto;
 }

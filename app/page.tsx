@@ -180,7 +180,7 @@ export default function Home() {
 		<LocalizationProvider dateAdapter={AdapterDayjs}>
 			<main className="text-center">
 				<header className="mb-8">
-					<h2 className={styles.dateHeader}>{today.format("dddd MMMM DD, YYYY")}</h2>
+					<h2 className={styles.dateHeader}>{today.format("dddd MMMM D, YYYY")}</h2>
 				</header>
 				<div className="flex w-full">
 					<div className={styles.todayLessonsSection}>
