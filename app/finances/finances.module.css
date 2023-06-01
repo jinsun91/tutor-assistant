@@ -46,4 +46,10 @@
 
 .displayLineBreak {
     white-space: pre-line;
+    width: 200px;
+    margin: 0 auto;
+}
+
+.invoiceContainer {
+    width: 300px;
 }

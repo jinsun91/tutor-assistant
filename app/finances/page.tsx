@@ -340,13 +340,11 @@ function Invoice({getFinances, selectedEntries, setAllRowsSelected}: InvoiceProp
     const [invoice, setInvoice] = useState("");
 
     function writeInvoice() {
-        console.log("HEREEEE")
-        console.log(selectedEntries);
         let invoiceStr = "";
         for (let i = 0; i < selectedEntries.length; i++) {
-            invoiceStr += dayjs(selectedEntries[i].date).format("MMM DD") + " - $" + formatIncome(selectedEntries[i].amount) + "\n";
+            invoiceStr += dayjs(selectedEntries[i].date).format("MMMM D, YYYY") + " - $" + formatIncome(selectedEntries[i].amount) + "\n";
         }
-        invoiceStr += "Total: $" + formatIncome(selectedEntries.reduce((acc, income: IncomeEntry) => acc + income.amount, 0));
+        invoiceStr += "\nTotal: $" + formatIncome(selectedEntries.reduce((acc, income: IncomeEntry) => acc + income.amount, 0));
         return invoiceStr;
     }
 
@@ -370,17 +368,20 @@ function Invoice({getFinances, selectedEntries, setAllRowsSelected}: InvoiceProp
                     <FaFileInvoiceDollar size={23} className="text-yellow-500" />
                 </div>
             </div>
-            <Modal isModalOpen={isModalOpen}>
-                <div className="w-full">
-                    <div className={styles.displayLineBreak}>
-                        {invoice}
-                    </div>
+            <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
+                <div className="modal-box w-2/12">
                     <div>
-                        <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Close</button>
-                        <button className="btn" onClick={handleCopy}>Copy</button>
-                    </div>
-                </div>            
-            </Modal>
+                        <h3 className="font-bold text-lg mb-3">Invoice</h3>
+                        <div className={styles.displayLineBreak}>
+                            {invoice}
+                        </div>
+                        <div className="modal-action">
+                            <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Close</button>
+                            <button className="btn" onClick={handleCopy}>Copy</button>
+                        </div>
+                    </div>       
+                </div>
+            </div>
         </>
     )
 }
