@@ -41,9 +41,7 @@ interface DeleteIncomeProps {
 }
 
 interface InvoiceProps {
-    getFinances: () => Promise<void>,
     selectedEntries: IncomeEntry[],
-    setAllRowsSelected: (val: boolean) => void,
 }
 
 interface MarkReceivedProps {
@@ -190,21 +188,36 @@ function DeleteIncome({getFinances, selectedEntries, setAllRowsSelected}: Delete
                     <BsTrash3Fill cursor="pointer" size={23} className="text-gray-500" />
                 </div>
             </div>
-            <Modal isModalOpen={isModalOpen}>
-                <h3 className="font-bold text-lg text-center">Are you sure you want to delete {selectedEntries.length} {selectedEntries.length == 1 ? "item" : "items"}?</h3>
-                <div className="flex justify-center">
-                    <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                    <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I'm sure</button>
+            {
+                selectedEntries.length === 0 ?
+                <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
+                    <div className="modal-box w-2/12">
+                        <div>
+                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setIsModalOpen(false)}>✕</button>
+                            <div>Please select at least one row from the table to Delete.</div>
+                        </div>       
+                    </div>
                 </div>
-            </Modal>
+                :
+                <Modal isModalOpen={isModalOpen}>
+                    <h3 className="font-bold text-lg text-center mb-4">Are you sure you want to delete {selectedEntries.length} {selectedEntries.length == 1 ? "item" : "items"}?</h3>
+                    <div className="flex justify-center">
+                        <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I'm sure</button>
+                    </div>
+                </Modal>
+            }
         </>
     )
 }
 
 function MarkReceived({isReceived, getFinances, selectedEntries, setAllRowsSelected}: MarkReceivedProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     function handleMarkReceived() {
-        if (selectedEntries.length > 0) {
+        if (selectedEntries.length === 0) {
+            setIsModalOpen(true);
+        } else {
             const selectedEntriesIds = selectedEntries.map((entry) => entry.id);
 
             const requestPayload = {
@@ -228,6 +241,14 @@ function MarkReceived({isReceived, getFinances, selectedEntries, setAllRowsSelec
             <div className="tooltip" data-tip={isReceived === 0 ? "Mark as Not Received" : "Mark as Received"}>
                 <div className="shadow-md rounded-xl p-2.5 mx-1 hover:bg-gray-50 cursor-pointer" onClick={handleMarkReceived}>
                     { isReceived === 0 ? <ImCross size={23} className="text-red-500" /> : <ImCheckmark size={23} className="text-green-500" />}
+                </div>
+            </div>
+            <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
+                <div className="modal-box w-2/12">
+                    <div>
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setIsModalOpen(false)}>✕</button>
+                        <div>Please select at least one row from the table to Mark as {!isReceived ? "Not " : ""}Received.</div>
+                    </div>       
                 </div>
             </div>
         </>
@@ -343,7 +364,7 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
     )
 }
 
-function Invoice({getFinances, selectedEntries, setAllRowsSelected}: InvoiceProps) {
+function Invoice({selectedEntries}: InvoiceProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [invoice, setInvoice] = useState("");
 
@@ -376,20 +397,32 @@ function Invoice({getFinances, selectedEntries, setAllRowsSelected}: InvoiceProp
                     <FaFileInvoiceDollar size={23} className="text-yellow-500" />
                 </div>
             </div>
-            <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
-                <div className="modal-box w-2/12">
-                    <div>
-                        <h3 className="font-bold text-lg mb-3">Invoice</h3>
-                        <div className={styles.displayLineBreak}>
-                            {invoice}
-                        </div>
-                        <div className="modal-action">
-                            <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Close</button>
-                            <button className="btn" onClick={handleCopy}>Copy</button>
-                        </div>
-                    </div>       
+            {
+                selectedEntries.length === 0 ?
+                <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
+                    <div className="modal-box w-2/12">
+                        <div>
+                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setIsModalOpen(false)}>✕</button>
+                            <div>Please select at least one row from the table to Create an Invoice.</div>
+                        </div>       
+                    </div>
                 </div>
-            </div>
+                :
+                <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
+                    <div className="modal-box w-2/12">
+                        <div>
+                            <h3 className="font-bold text-lg mb-3">Invoice</h3>
+                            <div className={styles.displayLineBreak}>
+                                {invoice}
+                            </div>
+                            <div className="modal-action">
+                                <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Close</button>
+                                <button className="btn" onClick={handleCopy}>Copy</button>
+                            </div>
+                        </div>       
+                    </div>
+                </div>
+            }
         </>
     )
 }
@@ -468,19 +501,14 @@ export default function Finances() {
         let filteredEntries = [...entries];
         console.log(filterEntries);
         if (year != 0) {
-            console.log("Enter year");
             filteredEntries = filteredEntries.filter((entry) => parseInt(entry.date.format("YYYY")) === year);
         }
 
         if (month !== "0") {
-            console.log("Enter month");
-            console.log(month);
             filteredEntries = filteredEntries.filter((entry) => entry.date.format("MMM") === month);
         }
 
         if (studentId != -1) {
-            console.log("Enter student");
-            console.log(studentId);
             filteredEntries = filteredEntries.filter((entry) => entry.student_id === studentId);
         }
         console.log(filteredEntries);
@@ -543,7 +571,7 @@ export default function Finances() {
                     <div className={styles.financeActionsOuterContainer}>
                         <AddIncome getFinances={getFinances} />
                         <div className={styles.financeActionsContainer}>
-                            <Invoice getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected} />
+                            <Invoice selectedEntries={selectedRows} />
                             <DeleteIncome getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                             <MarkReceived isReceived={1} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
                             <MarkReceived isReceived={0} getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
