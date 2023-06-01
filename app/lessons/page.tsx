@@ -105,17 +105,22 @@ function AddLesson({getLessons}: AddLessonProps) {
     }
 
     function handleStudentChange(e: ChangeEvent<HTMLSelectElement>) {
-        const selectedStudentId = parseInt(e.target.value)
-        setStudentId(selectedStudentId);
-        const selectedStudent = students.find((s: Student) => s.id === selectedStudentId);
-        if (selectedStudent !== undefined) {
-            setDurationHours(selectedStudent.lesson_duration_hours);
-            setDurationMins(selectedStudent.lesson_duration_mins);
-            setIncome(calculateLessonIncome(selectedStudent.lesson_rate, selectedStudent.lesson_duration_hours, selectedStudent.lesson_duration_mins));
+        if (e.target.value === "") {
+            setStudentId(-1);
+            setDurationHours(0);
+            setDurationMins(0);
+            setIncome(0);
+        } else {
+            const selectedStudentId = parseInt(e.target.value)
+            setStudentId(selectedStudentId);
+            const selectedStudent = students.find((s: Student) => s.id === selectedStudentId);
+            if (selectedStudent !== undefined) {
+                setDurationHours(selectedStudent.lesson_duration_hours);
+                setDurationMins(selectedStudent.lesson_duration_mins);
+                setIncome(calculateLessonIncome(selectedStudent.lesson_rate, selectedStudent.lesson_duration_hours, selectedStudent.lesson_duration_mins));
+            }
         }
-        
     }
-    console.log(income);
 
     return (
         <>
@@ -243,6 +248,11 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     }
 
     function handleStudentChange(e: ChangeEvent<HTMLSelectElement>) {
+        console.log(e.target.value);
+        if (e.target.value === "") {
+            return;
+        }
+
         const selectedStudentId = parseInt(e.target.value)
         setStudentId(selectedStudentId);
         const selectedStudent: any = students.find((s: Student) => s.id === selectedStudentId);
@@ -266,11 +276,11 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
                         <div>
-                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={handleStudentChange}>
-                                <option value={-1} disabled>Choose Student</option>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={handleStudentChange} required>
+                                <option value="" disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
-                                        return <option key={student.id} value={student.id}>{student.name}</option>
+                                        return <option key={student.id} value={`${student.id}`}>{student.name}</option>
                                     })
                                 }
                             </select>
@@ -282,11 +292,11 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
                         <div className={styles.modalLabels}>Duration</div>
                         <div className="flex items-center">
                             <label className="input-group">
-                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-20" value={isNaN(durationHours) ? durationHours.toString() : durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}} required/>
                                 <span>hrs</span>
                             </label>
                             <label className="input-group">
-                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-20" value={isNaN(durationMins) ? durationMins.toString() : durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}} required/>
                                 <span>mins</span>
                             </label>
                         </div>
@@ -294,7 +304,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
                         <div>
                             <label className="input-group">
                                 <span>$</span>
-                                <input type="number" className="input input-bordered w-28" value={income} onChange={e => {setIncome(parseFloat(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-28" value={isNaN(income) ? income.toString() : formatIncome(income)} onChange={e => {setIncome(parseFloat(e.target.value))}} required/>
                             </label>
                         </div>
                         <div className={styles.modalLabels}>Completed</div>
@@ -348,13 +358,11 @@ function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
                                     row.map((day, colIndex) => {
                                         return (
                                             <div className="border border-gray-200 flex flex-col" key={colIndex}>
-                                                <header className="flex flex-col items-left">
-                                                    <div className={`${getCurrentDayClass(day)} ${styles.dateCircle}`}>
-                                                        <p className={`${styles.date} text-sm inline-block text-left`}>
-                                                            {day.date() === 1 ? day.format('MMM D') : day.format('D')}
-                                                        </p>
-                                                    </div>
-                                                </header>
+                                                <div className={`text-right ${getCurrentDayClass(day)} ${styles.dateCircle} `}>
+                                                    <p className={`${styles.date} text-sm inline-block`}>
+                                                        {day.date() === 1 ? day.format('MMM D') : day.format('D')}
+                                                    </p>
+                                                </div>
                                                 <div>
                                                     { getDayLessons(lessons, day).map(lesson => {
                                                         return <LessonInfo getLessons={getLessons} lesson={lesson} key={lesson.id}/>
