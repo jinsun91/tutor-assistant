@@ -55,6 +55,7 @@ function AddLesson({getLessons}: AddLessonProps) {
     const [income, setIncome] = useState(0);
     const [completed, setCompleted] = useState(0);
     const [students, setStudents] = useState<Student[]>([]);
+    const [dateTimeError, setDateTimeError] = useState(false);
 
     async function getStudents() {
         fetch("/api/students")
@@ -79,6 +80,10 @@ function AddLesson({getLessons}: AddLessonProps) {
     const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
+        if (dateTimeError) {
+            return;
+        }
+
         const lesson = {
             student_id: parseInt(studentId),
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
@@ -99,8 +104,11 @@ function AddLesson({getLessons}: AddLessonProps) {
     }
 
     function handleDateTimeChange(newValue: Dayjs | null) {
-        if (newValue !== null) {
+        if (!newValue?.isValid()) {
+            setDateTimeError(true);
+        } else if (newValue !== null) {
             setDateTime(newValue);
+            setDateTimeError(false);
         }
     }
 
@@ -134,7 +142,7 @@ function AddLesson({getLessons}: AddLessonProps) {
                         </div>
                         <div className={styles.modalLabels}>Date and Time</div>
                         <div>
-                            <DateTimePicker className="w-full" value={dateTime} onChange={handleDateTimeChange}/>
+                            <DateTimePicker className="w-full" value={dateTime} onChange={handleDateTimeChange} />
                         </div>
                         <div className={styles.modalLabels}>Duration</div>
                         <div className="flex items-center">

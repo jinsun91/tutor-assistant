@@ -64,6 +64,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     const [amount, setAmount] = useState(0);
     const [received, setReceived] = useState(0);
     const [students, setStudents] = useState([]);
+    const [dateError, setDateError] = useState(false);
 
     async function getStudents() {
         fetch("/api/students")
@@ -88,6 +89,10 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
+        if (dateError) {
+            return;
+        }
+
         const income = {
             date: date?.format("YYYY-MM-DD"),
             student_id: parseInt(studentId),
@@ -106,8 +111,11 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     }
 
     function handleDateChange(newValue: Dayjs | null) {
-        if (newValue !== null) {
+        if (!newValue?.isValid()) {
+            setDateError(true);
+        } else if (newValue !== null) {
             setDate(newValue);
+            setDateError(false);
         }
     }
 
@@ -131,7 +139,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
                         </div>
                         <div className={styles.modalLabels}>Date</div>
                         <div>
-                            <DatePicker className="w-full" value={date} onChange={handleDateChange}/>
+                            <DatePicker className="w-full" value={date} onChange={handleDateChange} />
                         </div>
                         <div className={styles.modalLabels}>Amount</div>
                         <div>
