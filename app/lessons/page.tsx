@@ -48,7 +48,7 @@ interface LessonInfoProps {
 
 function AddLesson({getLessons}: AddLessonProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [studentId, setStudentId] = useState(-1);
+    const [studentId, setStudentId] = useState("");
     const [dateTime, setDateTime] = useState<Dayjs | null>(dayjs(Date.now()));
     const [durationHours, setDurationHours] = useState(0);
     const [durationMins, setDurationMins] = useState(0);
@@ -68,7 +68,7 @@ function AddLesson({getLessons}: AddLessonProps) {
 
     function openModal() {
         setIsModalOpen(true);
-        setStudentId(-1);
+        setStudentId("");
         setDateTime(dayjs(Date.now()));
         setDurationHours(0);
         setDurationMins(0);
@@ -80,7 +80,7 @@ function AddLesson({getLessons}: AddLessonProps) {
         e.preventDefault();
 
         const lesson = {
-            student_id: studentId,
+            student_id: parseInt(studentId),
             date_time: dateTime?.format("YYYY-MM-DD HH:mm:ss"),
             duration_hours: durationHours,
             duration_mins: durationMins,
@@ -105,20 +105,12 @@ function AddLesson({getLessons}: AddLessonProps) {
     }
 
     function handleStudentChange(e: ChangeEvent<HTMLSelectElement>) {
-        if (e.target.value === "") {
-            setStudentId(-1);
-            setDurationHours(0);
-            setDurationMins(0);
-            setIncome(0);
-        } else {
-            const selectedStudentId = parseInt(e.target.value)
-            setStudentId(selectedStudentId);
-            const selectedStudent = students.find((s: Student) => s.id === selectedStudentId);
-            if (selectedStudent !== undefined) {
-                setDurationHours(selectedStudent.lesson_duration_hours);
-                setDurationMins(selectedStudent.lesson_duration_mins);
-                setIncome(calculateLessonIncome(selectedStudent.lesson_rate, selectedStudent.lesson_duration_hours, selectedStudent.lesson_duration_mins));
-            }
+        setStudentId(e.target.value);
+        const selectedStudent = students.find((s: Student) => s.id === parseInt(e.target.value));
+        if (selectedStudent !== undefined) {
+            setDurationHours(selectedStudent.lesson_duration_hours);
+            setDurationMins(selectedStudent.lesson_duration_mins);
+            setIncome(calculateLessonIncome(selectedStudent.lesson_rate, selectedStudent.lesson_duration_hours, selectedStudent.lesson_duration_mins));
         }
     }
 
@@ -132,10 +124,10 @@ function AddLesson({getLessons}: AddLessonProps) {
                         <div className={styles.modalLabels}>Student</div>
                         <div>
                             <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={handleStudentChange} required>
-                                <option value="">Choose Student</option>
+                                <option value="" disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
-                                        return <option key={student.id} value={student.id}>{student.name}</option>
+                                        return <option key={student.id} value={student.id.toString()}>{student.name}</option>
                                     })
                                 }
                             </select>
@@ -349,7 +341,7 @@ function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
                 <p className="text-sm mt-1">FRI</p>
                 <p className="text-sm mt-1">SAT</p>
             </div>
-            <div className="flex-1 grid grid-cols-7 grid-rows-6">
+            <div className={styles.calendarContainer}>
                 {
                     getMonth(monthIndex).map((row, rowIndex) => 
                         (
@@ -357,7 +349,7 @@ function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
                                 {
                                     row.map((day, colIndex) => {
                                         return (
-                                            <div className={`border border-gray-200 flex flex-col ${getCurrentDayClass(day)}`} key={colIndex}>
+                                            <div className={`box-border border border-gray-200 flex flex-col ${getCurrentDayClass(day)} align-top`} key={colIndex}>
                                                 <div className="text-right">
                                                     {
                                                         day.date() === 1 && <span className="text-sm">{day.format('MMM')}</span>
