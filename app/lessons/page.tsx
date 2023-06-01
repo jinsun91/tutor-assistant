@@ -240,11 +240,6 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     }
 
     function handleStudentChange(e: ChangeEvent<HTMLSelectElement>) {
-        console.log(e.target.value);
-        if (e.target.value === "") {
-            return;
-        }
-
         const selectedStudentId = parseInt(e.target.value)
         setStudentId(selectedStudentId);
         const selectedStudent: any = students.find((s: Student) => s.id === selectedStudentId);
@@ -272,7 +267,7 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
                                 <option value="" disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
-                                        return <option key={student.id} value={`${student.id}`}>{student.name}</option>
+                                        return <option key={student.id} value={student.id}>{student.name}</option>
                                     })
                                 }
                             </select>

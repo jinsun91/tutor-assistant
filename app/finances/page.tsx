@@ -60,7 +60,7 @@ interface AddIncomeProps {
 function AddIncome({ getFinances }: AddIncomeProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [date, setDate] = useState(dayjs(Date.now()));
-    const [studentId, setStudentId] = useState(-1);
+    const [studentId, setStudentId] = useState("");
     const [amount, setAmount] = useState(0);
     const [received, setReceived] = useState(0);
     const [students, setStudents] = useState([]);
@@ -78,7 +78,7 @@ function AddIncome({ getFinances }: AddIncomeProps) {
     function openModal() {
         setIsModalOpen(true);
         setDate(dayjs(Date.now()));
-        setStudentId(-1);
+        setStudentId("");
         setAmount(0);
         setReceived(0);
     }
@@ -90,12 +90,11 @@ function AddIncome({ getFinances }: AddIncomeProps) {
 
         const income = {
             date: date?.format("YYYY-MM-DD"),
-            student_id: studentId,
+            student_id: parseInt(studentId),
             amount: amount,
             received: received
         }
         
-        console.log(income);
         fetch("/api/finances", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -121,11 +120,11 @@ function AddIncome({ getFinances }: AddIncomeProps) {
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
                         <div>
-                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
-                                <option value={-1} disabled>Choose Student</option>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(e.target.value)}} required>
+                                <option value="" disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
-                                        return <option key={student.id} value={student.id}>{student.name}</option>
+                                        return <option key={student.id} value={student.id.toString()}>{student.name}</option>
                                     })
                                 }
                             </select>
@@ -138,12 +137,12 @@ function AddIncome({ getFinances }: AddIncomeProps) {
                         <div>
                             <label className="input-group">
                                 <span>$</span>
-                                <input type="number" value={amount} placeholder="Enter Amount" onChange={e => {setAmount(parseFloat(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
+                                <input type="number" value={isNaN(amount) ? amount.toString() : amount} placeholder="Enter Amount" onChange={e => {setAmount(parseFloat(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" required/>
                             </label>
                         </div>
                         <div className={styles.modalLabels}>Received</div>
                         <div>
-                            <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                            <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs" required>
                                 <option key={0} value={0}>No</option>
                                 <option key={1} value={1}>Yes</option>
                             </select>
@@ -290,7 +289,7 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Student</div>
                         <div>
-                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}}>
+                            <select className="select select-bordered w-full max-w-xs" value={studentId} onChange={e => {setStudentId(parseInt(e.target.value))}} required>
                                 <option value={-1} disabled>Choose Student</option>
                                 {
                                     students.map((student: Student) => {
@@ -307,12 +306,12 @@ function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
                         <div>
                             <label className="input-group">
                                 <span>$</span>
-                                <input type="number" value={amount} placeholder="Enter Amount" onChange={e => {setAmount(parseFloat(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" />
+                                <input type="number" value={isNaN(amount) ? amount.toString() : amount} placeholder="Enter Amount" onChange={e => {setAmount(parseFloat(e.target.value))}} className="input input-md input-bordered w-full max-w-xs" required/>
                             </label>
                         </div>
                         <div className={styles.modalLabels}>Received</div>
                         <div>
-                            <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs">
+                            <select value={received} onChange={e => {setReceived(parseInt(e.target.value))}} className="select select-bordered w-full max-w-xs" required>
                                 <option key={0} value={0}>No</option>
                                 <option key={1} value={1}>Yes</option>
                             </select>
@@ -560,7 +559,7 @@ export default function Finances() {
                                                     <input type="checkbox" checked={value.isSelected} className="checkbox checkbox-sm" onChange={(e) => handleIncomeSelectChange(e, index, value)}/>
                                                 </label>
                                             </td>
-                                            <td>{value.date.format("MMM DD, YYYY")}</td>
+                                            <td>{value.date.format("MMM D, YYYY")}</td>
                                             <td>{value.student_name}</td>
                                             <td>${formatIncome(value.amount)}</td>
                                             <td className={value.received === 0 ? "bg-red-200" : "bg-green-200"}>{value.received === 0 ? "No" : "Yes"}</td>
