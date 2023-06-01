@@ -335,7 +335,7 @@ export function getDayLessons(lessons: Lesson[], day: Dayjs) {
 function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
     function getCurrentDayClass(day: Dayjs) {
         return day.format("DD-MM-YY") === dayjs().format("DD-MM-YY") ?
-            "bg-blue-600 text-white rounded-full w-6 h-6" : "";
+            `${styles.currentDay}` : "";
     }
 
     return ( 
@@ -357,11 +357,14 @@ function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
                                 {
                                     row.map((day, colIndex) => {
                                         return (
-                                            <div className="border border-gray-200 flex flex-col" key={colIndex}>
-                                                <div className={`text-right ${getCurrentDayClass(day)} ${styles.dateCircle} `}>
-                                                    <p className={`${styles.date} text-sm inline-block`}>
-                                                        {day.date() === 1 ? day.format('MMM D') : day.format('D')}
-                                                    </p>
+                                            <div className={`border border-gray-200 flex flex-col ${getCurrentDayClass(day)}`} key={colIndex}>
+                                                <div className="text-right">
+                                                    {
+                                                        day.date() === 1 && <span className="text-sm">{day.format('MMM')}</span>
+                                                    }
+                                                    <span className={`${styles.date} text-sm inline-block mr-1`}>
+                                                        {day.format('D')}
+                                                    </span>
                                                 </div>
                                                 <div>
                                                     { getDayLessons(lessons, day).map(lesson => {

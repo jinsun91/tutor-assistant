@@ -50,7 +50,7 @@
     padding-left: 3px;
 }
 
-.dateCircle {
-    margin-left: 5px;
-    margin-top: 5px;
+.currentDay {
+    background-color: azure;
+    border: solid 4px lightsteelblue;
 }
