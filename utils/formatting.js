@@ -12,6 +12,10 @@ export function addCommas(number) {
 }
 
 export function formatDateTime(hours, mins) {
+    if (hours === 0 && mins === 0) {
+        return "0 mins";
+    }
+
     let formattedStr = "";
     if (hours > 0) {
         if (hours === 1) {

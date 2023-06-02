@@ -73,20 +73,20 @@ function AddStudent({ getStudents }: AddStudentProps) {
                     <div className={styles.modalContainer}>
                         <div className={styles.modalLabels}>Name</div>
                         <div>
-                            <input value={name} onChange={e => {setName(e.target.value)}}  type="text" className="input input-bordered w-full" />
+                            <input value={name} onChange={e => {setName(e.target.value)}}  type="text" className="input input-bordered w-full" required />
                         </div>
                         <div className={styles.modalLabels}>Subject</div>
                         <div>
-                            <input value={subject} onChange={e => {setSubject(e.target.value)}} type="text" className="input input-bordered w-full" />
+                            <input value={subject} onChange={e => {setSubject(e.target.value)}} type="text" className="input input-bordered w-full" required />
                         </div>
                         <div className={styles.modalLabels}>Lesson Duration</div>
                         <div className="flex items-center">
                             <label className="input-group">
-                                <input type="number" className="input input-bordered w-20" value={durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-20" value={isNaN(durationHours) ? durationHours.toString() : durationHours} onChange={e => {setDurationHours(parseInt(e.target.value))}} required />
                                 <span>hrs</span>
                             </label>
                             <label className="input-group">
-                                <input type="number" className="input input-bordered w-20" value={durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-20" value={isNaN(durationMins) ? durationMins.toString() : durationMins} onChange={e => {setDurationMins(parseInt(e.target.value))}} required />
                                 <span>mins</span>
                             </label>
                         </div>
@@ -94,7 +94,7 @@ function AddStudent({ getStudents }: AddStudentProps) {
                         <div>
                             <label className="input-group">
                                 <span>$</span>
-                                <input type="number" className="input input-bordered w-24" value={rate} onChange={e => {setRate(parseInt(e.target.value))}}/>
+                                <input type="number" className="input input-bordered w-24" value={isNaN(rate) ? rate.toString() : rate} onChange={e => {setRate(parseInt(e.target.value))}} required />
                                 <span>per hour</span>
                             </label>
                         </div>
