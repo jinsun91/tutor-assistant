@@ -124,7 +124,7 @@ function AddLesson({getLessons}: AddLessonProps) {
 
     return (
         <>
-            <button onClick={openModal} className="btn btn-success">Add New Lesson</button>
+            <button onClick={openModal} className="btn btn-sm btn-outline btn-info">Add New Lesson</button>
             <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleAdd} className="w-full px-2">
                     <h3 className="font-bold text-lg mt-1 mb-3">Add New Lesson</h3>
@@ -172,7 +172,7 @@ function AddLesson({getLessons}: AddLessonProps) {
                     </div>
                     <div className="modal-action">
                         <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                        <button type="submit" className="btn btn-success">Add</button>
+                        <button type="submit" className="btn">Add</button>
                     </div>
                 </form>
             </Modal>

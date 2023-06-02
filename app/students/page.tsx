@@ -66,7 +66,7 @@ function AddStudent({ getStudents }: AddStudentProps) {
 
     return (
         <>
-            <button className="btn btn-outline btn-primary w-full" onClick={openModal}>Add New Student <AiOutlinePlus size={20} /></button>
+            <button className="btn btn-outline btn-info w-full" onClick={openModal}>Add New Student <AiOutlinePlus size={20} /></button>
             <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleAdd} className="w-full px-2">
                     <h3 className="font-bold text-lg mt-1 mb-3">Add New Student</h3>
@@ -101,7 +101,7 @@ function AddStudent({ getStudents }: AddStudentProps) {
                     </div>
                     <div className="modal-action">
                         <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                        <button type="submit" className="btn btn-success">Add</button>
+                        <button type="submit" className="btn">Add</button>
                     </div>
                 </form>
             </Modal>
@@ -177,7 +177,7 @@ function EditStudent({getStudents, student}: ModifyStudentProps) {
 
     return (
         <>
-            <button className="btn btn-outline btn-success mr-2.5" onClick={openModal}>Edit <HiOutlinePencil size={20}/></button>
+            <button className="btn btn-outline btn-primary mr-2.5" onClick={openModal}>Edit <HiOutlinePencil size={20}/></button>
             <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleEdit}>
                 <h3 className="font-bold text-lg mt-1 mb-3">Edit Student</h3>
