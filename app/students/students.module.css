@@ -15,8 +15,26 @@
     border: solid grey 1px;
     margin: 10px 0;
     height: 90%;
-    overflow: hidden;
     overflow: auto;
+}
+
+.studentListItem {
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+.selectedStudent {
+    background-color: lightblue;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+.selectedStudent:hover {
+    background-color: lightblue;
+}
+
+.studentListItem:hover {
+    background-color: #ECECEC;
 }
 
 .studentInfoContainer {

@@ -264,11 +264,11 @@ export default function Students() {
 
     return (
         <div className={styles.container}>
-            <div className={`${styles.studentListSection}`}>
-                <ul className={`menu bg-base-100 ${styles.studentList}`}>
+            <div className={styles.studentListSection}>
+                <ul className={styles.studentList}>
                     { 
                         students.map(({id, name}: Student, i: number) => {
-                            return <li key={id} className="w-full" onClick={() => handleClick(i)}><a className={index === i ? "active" : ""}>{name}</a></li>
+                            return <li key={id} className={`w-full ${index === i ? styles.selectedStudent : styles.studentListItem}`} onClick={() => handleClick(i)}>{name}</li>
                         })
                     }
                 </ul>
