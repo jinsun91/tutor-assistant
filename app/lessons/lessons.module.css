@@ -30,7 +30,7 @@
     font-size: 13px;
 }
 .lessonInfoContainer:hover {
-    background-color: lightgray;
+    background-color: #ECECEC;
 }
 
 .modalContainer {
@@ -43,9 +43,11 @@
 }
 
 .calendarContainer {
+    width: 1092px;;
     display: grid;
     grid-template-columns: repeat(7, 156px);
     grid-template-rows: repeat(6, minmax(110px, auto));
+    border: solid 1px rgb(229 231 235);
 }
 
 .dayOfWeekLabelContainer {
@@ -66,6 +68,5 @@
 
 .currentDay {
     box-sizing: border-box;
-    background-color: azure;
-    border: solid 4px lightsteelblue;
+    background-color: lightblue;
 }

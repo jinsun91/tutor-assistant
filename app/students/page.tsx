@@ -1,6 +1,5 @@
 "use client"
 
-import { AiOutlinePlus } from 'react-icons/ai';
 import { HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi';
 import styles from './students.module.css';
 import { useState, useEffect, FormEventHandler } from 'react';
@@ -66,7 +65,7 @@ function AddStudent({ getStudents }: AddStudentProps) {
 
     return (
         <>
-            <button className="btn btn-outline btn-info w-full" onClick={openModal}>Add New Student <AiOutlinePlus size={20} /></button>
+            <button className="btn btn-outline btn-info w-full" onClick={openModal}>Add New Student</button>
             <Modal isModalOpen={isModalOpen}>
                 <form onSubmit={handleAdd} className="w-full px-2">
                     <h3 className="font-bold text-lg mt-1 mb-3">Add New Student</h3>

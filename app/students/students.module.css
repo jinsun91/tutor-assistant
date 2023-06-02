@@ -12,7 +12,7 @@
 }
 
 .studentList {
-    border: solid grey 1px;
+    border: solid #ECECEC 1px;
     margin: 10px 0;
     height: 90%;
     overflow: auto;
@@ -40,7 +40,7 @@
 .studentInfoContainer {
     margin: 10px 0;
     margin-left: 30px;
-    border: solid grey 1px;
+    border: solid #ECECEC 1px;
     height: 100%;
     padding: 15px 25px;
     line-height: 2;
