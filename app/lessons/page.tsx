@@ -8,8 +8,10 @@ import styles from './lessons.module.css';
 import Modal from '../components/Modal';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { calculateLessonIncome, formatIncome } from '../../utils/formatting';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 export type Lesson = {
     id: number,
@@ -396,7 +398,8 @@ export default function Lessons() {
         .then(response => response.json())
         .then(data => {
             const formattedData = data.map((lesson: Lesson) => {
-                return {...lesson, date_time: dayjs(lesson.date_time), completed: lesson.completed ? 1 : 0}
+                const originalTimezone = lesson.date_time.toString().slice(-6);
+                return {...lesson, date_time: dayjs(lesson.date_time).utcOffset(originalTimezone), completed: lesson.completed ? 1 : 0}
             });
             setLessons(formattedData);
         });

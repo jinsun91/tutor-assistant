@@ -8,6 +8,8 @@ import { Lesson } from './lessons/page';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { formatIncome, formatDateTime } from '../utils/formatting';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 interface LessonsTableProps {
   	todayLessons: Lesson[],
@@ -105,7 +107,8 @@ export default function Home() {
 		.then(response => response.json())
 		.then(data => {
 			const formattedData = data.map((lesson: Lesson) => {
-				return {...lesson, date_time: dayjs(lesson.date_time), completed: lesson.completed ? 1 : 0}
+				const originalTimezone = lesson.date_time.toString().slice(-6);
+				return {...lesson, date_time: dayjs(lesson.date_time).utcOffset(originalTimezone), completed: lesson.completed ? 1 : 0}
 			});
 			setLessons(formattedData);
 			const today = dayjs(Date.now());

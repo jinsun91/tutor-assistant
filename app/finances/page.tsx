@@ -12,6 +12,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { formatIncome } from '../../utils/formatting';
 import { FaFileInvoiceDollar } from 'react-icons/fa';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 type Student = {
     id: number,
@@ -421,7 +423,8 @@ export default function Finances() {
         .then(response => response.json())
         .then(data => {
             const rows = data.map((income: IncomeEntry) => {
-                return {...income, date: dayjs(income.date), received: income.received ? 1 : 0, isSelected: false}
+                const originalTimezone = income.date.toString().slice(-6);
+                return {...income, date: dayjs(income.date).utcOffset(originalTimezone), received: income.received ? 1 : 0, isSelected: false}
             });
             setFinances(rows);
             setFilteredFinances(filterEntries(year, month, studentId, rows));
