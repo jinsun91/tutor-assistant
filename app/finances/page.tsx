@@ -210,7 +210,7 @@ function MarkReceived({isReceived, getFinances, selectedEntries, setAllRowsSelec
             const selectedEntriesIds = selectedEntries.map((entry) => entry.id);
 
             const requestPayload = {
-                isReceived: isReceived,
+                received: isReceived,
                 selectedEntries: selectedEntriesIds
             }
 
@@ -421,7 +421,7 @@ export default function Finances() {
         .then(response => response.json())
         .then(data => {
             const rows = data.map((income: IncomeEntry) => {
-                return {...income, date: dayjs(income.date), isSelected: false}
+                return {...income, date: dayjs(income.date), received: income.received ? 1 : 0, isSelected: false}
             });
             setFinances(rows);
             setFilteredFinances(filterEntries(year, month, studentId, rows));
@@ -456,8 +456,12 @@ export default function Finances() {
         newFinances[index] = {...value, isSelected: e.target.checked};
         setFilteredFinances(newFinances);
 
-        if (e.target.checked === false && allRowsSelected === true) {
+        if (!e.target.checked && allRowsSelected === true) {
             setAllRowsSelected(false);
+        }
+        
+        if (e.target.checked && filteredFinances.length === 1) {
+            setAllRowsSelected(true);
         }
     }
 

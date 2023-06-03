@@ -105,7 +105,7 @@ export default function Home() {
 		.then(response => response.json())
 		.then(data => {
 			const formattedData = data.map((lesson: Lesson) => {
-				return {...lesson, date_time: dayjs(lesson.date_time)}
+				return {...lesson, date_time: dayjs(lesson.date_time), completed: lesson.completed ? 1 : 0}
 			});
 			setLessons(formattedData);
 			const today = dayjs(Date.now());

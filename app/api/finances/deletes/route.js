@@ -1,8 +1,9 @@
-import { getConnection } from '../../../../utils/db';
+import { sql } from '@vercel/postgres';
 
 export async function POST(request) {
     const res = await request.json();
-    const connection = await getConnection();
-    const [rows] = await connection.sql`DELETE FROM finances WHERE id IN (${res.join(", ")})`;
-    return new Response(JSON.stringify(rows));
+    for (let i = 0; i < res.length; i++) {
+        const {} = await sql`DELETE FROM finances WHERE id = ${res[i]}`;
+    }
+    return new Response(JSON.stringify({}));
 }
