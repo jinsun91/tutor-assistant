@@ -1,18 +1,8 @@
-import mysql from 'mysql2/promise';
+import { db } from '@vercel/postgres';
 
 let connection;
 
 export async function getConnection() {
-    if (!connection) {
-        connection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            dateStrings: true
-        });
-        connection.connect();
-    }
-
+    connection = db.connect();
     return connection;
 }
