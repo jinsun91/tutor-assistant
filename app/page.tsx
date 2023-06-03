@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { ImCheckmark, ImCross } from 'react-icons/im';
 import styles from './home.module.css'
-import { getDayLessons, Lesson } from './lessons/page';
+import { Lesson } from './lessons/page';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { formatIncome, formatDateTime } from '../utils/formatting';
@@ -109,8 +109,8 @@ export default function Home() {
 			});
 			setLessons(formattedData);
 			const today = dayjs(Date.now());
-			const todayLessons = getDayLessons(formattedData, today);
-			setTodayIncome(todayLessons.filter(lesson => lesson.completed === 1).reduce((acc, lesson: Lesson) => acc + lesson.income, 0));
+			const todayLessons = formattedData.filter((lesson: Lesson) => dayjs(lesson.date_time).format("DD-MM-YY") === today.format("DD-MM-YY"));
+			setTodayIncome(todayLessons.filter((lesson: Lesson) => lesson.completed === 1).reduce((acc: number, lesson: Lesson) => acc + lesson.income, 0));
 		});
 	}
 
@@ -174,7 +174,7 @@ export default function Home() {
 	}
 
 	const today = dayjs(Date.now());
-	const todayLessons = getDayLessons(lessons, today);
+	const todayLessons = lessons.filter(lesson => dayjs(lesson.date_time).format("DD-MM-YY") === today.format("DD-MM-YY"));
 
 	return (
 		<LocalizationProvider dateAdapter={AdapterDayjs}>

@@ -330,15 +330,15 @@ function LessonInfo({getLessons, lesson}: LessonInfoProps) {
     )
 }
 
-export function getDayLessons(lessons: Lesson[], day: Dayjs) {
-    const dayLessons = lessons.filter(lesson => dayjs(lesson.date_time).format("DD-MM-YY") === day.format("DD-MM-YY"));
-    return dayLessons;
-}
-
 function Calendar({monthIndex, lessons, getLessons}: CalendarProps) {
     function getCurrentDayClass(day: Dayjs) {
         return day.format("DD-MM-YY") === dayjs().format("DD-MM-YY") ?
             `${styles.currentDay}` : "";
+    }
+
+    function getDayLessons(lessons: Lesson[], day: Dayjs) {
+        const dayLessons = lessons.filter(lesson => dayjs(lesson.date_time).format("DD-MM-YY") === day.format("DD-MM-YY"));
+        return dayLessons;
     }
 
     return ( 
