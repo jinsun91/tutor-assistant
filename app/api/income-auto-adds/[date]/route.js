@@ -1,8 +1,7 @@
-import { getConnection } from '../../../../utils/db';
+import { sql } from '@vercel/postgres';
 
 export async function DELETE(request, context) {
     const date = context.params.date;
-    const connection = await getConnection();
-    const [rows] = await connection.sql`DELETE FROM income_auto_adds WHERE date = '${date}'`;
+    const {rows} = await sql`DELETE FROM income_auto_adds WHERE date = ${date}`;
     return new Response(JSON.stringify({}));
 }
