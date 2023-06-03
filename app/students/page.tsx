@@ -128,7 +128,7 @@ function DeleteStudent({getStudents, student}: ModifyStudentProps) {
                 <p>All calendar and finance information relating to {student.name} will also be deleted.</p>
                 <div className="flex justify-center">
                     <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                    <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I'm sure</button>
+                    <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I&apos;m sure</button>
                 </div>
             </Modal>
         </>

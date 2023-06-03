@@ -30,6 +30,7 @@ type IncomeEntry = {
 }
 
 interface EditIncomeProps {
+    students: Student[],
     getFinances: () => Promise<void>,
     incomeEntry: IncomeEntry
 }
@@ -52,27 +53,17 @@ interface MarkReceivedProps {
 }
 
 interface AddIncomeProps {
+    students: Student[],
     getFinances: () => Promise<void>
 }
 
-function AddIncome({ getFinances }: AddIncomeProps) {
+function AddIncome({ students, getFinances }: AddIncomeProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [date, setDate] = useState(dayjs(Date.now()));
     const [studentId, setStudentId] = useState("");
     const [amount, setAmount] = useState(0);
     const [received, setReceived] = useState(0);
-    const [students, setStudents] = useState([]);
     const [dateError, setDateError] = useState(false);
-
-    async function getStudents() {
-        fetch("/api/students")
-        .then(response => response.json())
-        .then(data => setStudents(data))
-    }
-
-    useEffect(() => {
-        getStudents();
-    }, []);
 
     function openModal() {
         setIsModalOpen(true);
@@ -81,8 +72,6 @@ function AddIncome({ getFinances }: AddIncomeProps) {
         setAmount(0);
         setReceived(0);
     }
-
-    console.log(students);
 
     const handleAdd: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -203,7 +192,7 @@ function DeleteIncome({getFinances, selectedEntries, setAllRowsSelected}: Delete
                     <h3 className="font-bold text-lg text-center mb-4">Are you sure you want to delete {selectedEntries.length} {selectedEntries.length == 1 ? "item" : "items"}?</h3>
                     <div className="flex justify-center">
                         <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                        <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I'm sure</button>
+                        <button className="btn ml-2 btn-accent" onClick={() => handleDelete()}>Yes, I&apos;m sure</button>
                     </div>
                 </Modal>
             }
@@ -255,24 +244,13 @@ function MarkReceived({isReceived, getFinances, selectedEntries, setAllRowsSelec
     )
 }
 
-function EditIncome({getFinances, incomeEntry}: EditIncomeProps) {
+function EditIncome({students, getFinances, incomeEntry}: EditIncomeProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [date, setDate] = useState(incomeEntry.date);
     const [studentId, setStudentId] = useState(incomeEntry.student_id);
     const [amount, setAmount] = useState(incomeEntry.amount);
     const [received, setReceived] = useState(incomeEntry.received);
-    const [students, setStudents] = useState([]);
     const [dateError, setDateError] = useState(false);
-
-    async function getStudents() {
-        fetch("/api/students")
-        .then(response => response.json())
-        .then(data => setStudents(data))
-    }
-
-    useEffect(() => {
-        getStudents();
-    }, []);
 
     function openModal() {
         setIsModalOpen(true);
@@ -381,10 +359,6 @@ function Invoice({selectedEntries}: InvoiceProps) {
         setIsModalOpen(true);
         setInvoice(writeInvoice());
     }
-
-    useEffect(() => {
-        setInvoice(writeInvoice());
-    }, []);
 
     function handleCopy() {
         navigator.clipboard.writeText(invoice);
@@ -569,7 +543,7 @@ export default function Finances() {
                         <button className="btn btn-sm ml-2" onClick={showAllEntries}>Show All</button>
                     </div>
                     <div className={styles.financeActionsOuterContainer}>
-                        <AddIncome getFinances={getFinances} />
+                        <AddIncome students={students} getFinances={getFinances} />
                         <div className={styles.financeActionsContainer}>
                             <Invoice selectedEntries={selectedRows} />
                             <DeleteIncome getFinances={getFinances} selectedEntries={selectedRows} setAllRowsSelected={setAllRowsSelected}/>
@@ -608,7 +582,7 @@ export default function Finances() {
                                             <td>{value.student_name}</td>
                                             <td>${formatIncome(value.amount)}</td>
                                             <td className={value.received === 0 ? "bg-red-200" : "bg-green-200"}>{value.received === 0 ? "No" : "Yes"}</td>
-                                            <td><EditIncome getFinances={getFinances} incomeEntry={value} /></td>
+                                            <td><EditIncome students={students} getFinances={getFinances} incomeEntry={value} /></td>
                                         </tr>
                                     )
                                 })

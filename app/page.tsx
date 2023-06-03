@@ -184,14 +184,14 @@ export default function Home() {
 				</header>
 				<div className="flex w-full">
 					<div className={styles.todayLessonsSection}>
-						<h2 className={styles.todayLessonsHeader}>Today's Lessons</h2>
+						<h2 className={styles.todayLessonsHeader}>Today&apos;s Lessons</h2>
 						<LessonsTable todayLessons={todayLessons} getLessons={getLessons} />
 					</div>
 					<div className={styles.todayEarningsSection}>
 						<div className={styles.todayEarningsContainer}>
 							<div className="stats shadow mb-5 w-64">
 								<div className="stat">
-									<div className="stat-title font-bold">Today's Income</div>
+									<div className="stat-title font-bold">Today&apos;s Income</div>
 									<div className="stat-value">${formatIncome(todayIncome)}</div>
 								</div>
 							</div>
