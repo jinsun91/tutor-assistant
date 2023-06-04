@@ -107,8 +107,7 @@ export default function Home() {
 		.then(response => response.json())
 		.then(data => {
 			const formattedData = data.map((lesson: Lesson) => {
-				const originalTimezone = lesson.date_time.toString().slice(-6);
-				return {...lesson, date_time: dayjs(lesson.date_time).utcOffset(originalTimezone), completed: lesson.completed ? 1 : 0}
+				return {...lesson, date_time: dayjs.utc(lesson.date_time), completed: lesson.completed ? 1 : 0}
 			});
 			setLessons(formattedData);
 			const today = dayjs(Date.now());

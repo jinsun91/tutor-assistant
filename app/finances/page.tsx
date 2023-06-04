@@ -423,8 +423,7 @@ export default function Finances() {
         .then(response => response.json())
         .then(data => {
             const rows = data.map((income: IncomeEntry) => {
-                const originalTimezone = income.date.toString().slice(-6);
-                return {...income, date: dayjs(income.date).utcOffset(originalTimezone), received: income.received ? 1 : 0, isSelected: false}
+                return {...income, date: dayjs.utc(income.date), received: income.received ? 1 : 0, isSelected: false}
             });
             setFinances(rows);
             setFilteredFinances(filterEntries(year, month, studentId, rows));

@@ -11,9 +11,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { calculateLessonIncome, formatIncome } from '../../utils/formatting';
 import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
-dayjs.extend(timezone);
 
 export type Lesson = {
     id: number,
@@ -400,8 +398,6 @@ export default function Lessons() {
         .then(response => response.json())
         .then(data => {
             const formattedData = data.map((lesson: Lesson) => {
-                console.log("DATE TIMEEEEE");
-                console.log(lesson.date_time);
                 return {...lesson, date_time: dayjs.utc(lesson.date_time), completed: lesson.completed ? 1 : 0}
             });
             console.log(formattedData);
