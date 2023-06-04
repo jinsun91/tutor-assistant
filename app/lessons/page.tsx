@@ -400,9 +400,11 @@ export default function Lessons() {
         .then(response => response.json())
         .then(data => {
             const formattedData = data.map((lesson: Lesson) => {
-                const timezone = dayjs.tz.guess();
-                return {...lesson, date_time: dayjs(lesson.date_time).tz(timezone), completed: lesson.completed ? 1 : 0}
+                console.log("DATE TIMEEEEE");
+                console.log(lesson.date_time);
+                return {...lesson, date_time: dayjs.utc(lesson.date_time), completed: lesson.completed ? 1 : 0}
             });
+            console.log(formattedData);
             setLessons(formattedData);
         });
     }
