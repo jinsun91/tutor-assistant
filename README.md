@@ -28,4 +28,4 @@ Created using NextJS 13, React, TypeScript, JavaScript, Tailwind CSS, Daisy UI, 
 - **Add** and **edit** an income entry
 - By selecting income entries in the table, you can batch **mark as received/not received** and **delete** income entries
 - By selecting income entries in the table, you can **create an invoice**.
-- Filter income entries based on **year**, **month**, and **student** to easily create invoices for a student at the end of the month.
+- **Filter income entries** based on **year**, **month**, and **student** to easily create invoices for a student at the end of the month.
