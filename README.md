@@ -1,6 +1,6 @@
 # Tutor Assistant
 
-### <a href="https://tutor-assistant.vercel.app/" target="_blank">Live Demo</a>
+### [Live Demo](https://tutor-assistant.vercel.app/)
 
 An app to manage all the admin work that comes with being a tutor.   
 It helps users keep track of their students, lessons, finances, and create invoices.
