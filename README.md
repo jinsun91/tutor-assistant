@@ -2,10 +2,19 @@
 
 ### [Live Demo](https://tutor-assistant.vercel.app/)
 
-An app to manage all the admin work that comes with being a tutor.  
-Created using NextJS 13, TypeScript, JavaScript, Tailwind CSS, Daisy UI, CSS, and HTML.
+An app to manage all the admin work that comes with being a tutor.   
+It helps users keep track of their students, lessons, finances, and create invoices.
+
+Created using NextJS 13, React, TypeScript, JavaScript, Tailwind CSS, Daisy UI, CSS, and HTML.
 
 ## Home Page
+![Home](https://github.com/jinsun91/tutor-assistant/assets/33980648/f4a3db73-e12e-4338-8ba6-60d8aa647431)
+- The Home page gives you a list of today's lessons.   
+- Upon completing a lesson you can **mark it as complete**, which will add that lesson's income amount to today's income.   
+- Once you've completed all of your lessons for the day you can click the **auto add to finances** button, which will create an income entry in the Finances page for each lesson.
+- The auto add to finances button will be disabled once you've clicked it for that day. If you want to enable it again, you can click the reset auto add button.
+
+
 
 First, run the development server:
 
