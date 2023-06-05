@@ -1,7 +1,7 @@
 import { sql } from '@vercel/postgres';
 
 export async function GET() {
-  const {rows} = await sql`SELECT * FROM students`;
+  const {rows} = await sql`SELECT * FROM students ORDER BY name`;
   return new Response(JSON.stringify(rows));
 }
 

@@ -1,6 +1,11 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Tutor Assistant
 
-## Getting Started
+### [Live Demo](https://tutor-assistant.vercel.app/)
+
+An app to manage all the admin work that comes with being a tutor.  
+Created using NextJS 13, TypeScript, JavaScript, Tailwind CSS, Daisy UI, CSS, and HTML.
+
+## Home Page
 
 First, run the development server:
 
